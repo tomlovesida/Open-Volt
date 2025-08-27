@@ -174,7 +174,7 @@ public final class ClickGui extends Screen {
         }
         context.fill(searchX, searchY, searchX + SEARCH_BAR_WIDTH, (searchY + SEARCH_BAR_HEIGHT) - 2, 
             new Color(40, 40, 50, 200).getRGB());
-        smallFont.drawString(matrices, clippedText, textX, textY, textColor);
+        smallFont.drawString(matrices, clippedText, textX, textY - 4, textColor);
         
         if (eventHandler.isSearchFocused() && !eventHandler.getSearchQuery().isEmpty()) {
             long currentTime = System.currentTimeMillis();
