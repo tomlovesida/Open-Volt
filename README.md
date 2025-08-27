@@ -24,6 +24,7 @@ Etho (1383737664645369926) – Moral support & Walmart Solutions
 # How to Contribute? 
 Either join the discord and DM me or make a pull request!
 I won't accept pull requests which refactor a lot of packages or are utterly pointless.
+(All Blatant features will get declined.)
 
 # Before pasting!
 
