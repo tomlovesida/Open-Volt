@@ -34,7 +34,7 @@ public class CommandManager {
         switch (command) {
             case "save", "saveconfig" -> handleSaveCommand(args);
             case "load", "loadconfig" -> handleLoadCommand(args);
-            case "profiles", "listprofiles" -> handleListProfilesCommand();
+            case "profiles", "listprofiles" -> handleListProfilesCommand(args);
             case "deleteprofile" -> handleDeleteProfileCommand(args);
             case "help", "commands" -> handleHelpCommand();
             default -> ChatUtils.addChatMessage("§cUnknown command: " + command + ". Type .help for available commands.");
@@ -70,28 +70,39 @@ public class CommandManager {
         String profileName = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
         profileManager.loadProfile(profileName);
     }
-    
-    private void handleListProfilesCommand() {
+
+    private void handleListProfilesCommand(String[] args) {
         File profileDir = new File(Volt.mc.runDirectory, "Volt" + File.separator + "profiles");
-        
+
         if (!profileDir.exists() || !profileDir.isDirectory()) {
             ChatUtils.addChatMessage("§cNo profiles directory found.");
             return;
         }
-        
+        if (args.length > 1 && args[1].equalsIgnoreCase("folder")) {
+            try {
+                java.awt.Desktop.getDesktop().open(profileDir);
+                ChatUtils.addChatMessage("§aOpened profiles folder!");
+            } catch (Exception e) {
+                ChatUtils.addChatMessage("§cFailed to open profiles folder.");
+                e.printStackTrace();
+            }
+            return;
+        }
+
         File[] profiles = profileDir.listFiles((dir, name) -> name.endsWith(".json"));
-        
+
         if (profiles == null || profiles.length == 0) {
             ChatUtils.addChatMessage("§eNo profiles found.");
             return;
         }
-        
+
         ChatUtils.addChatMessage("§bAvailable profiles:");
         for (File profile : profiles) {
             String name = profile.getName().replace(".json", "");
             ChatUtils.addChatMessage("§7- " + name);
         }
     }
+
     
     private void handleDeleteProfileCommand(String[] args) {
         if (args.length < 2) {
@@ -114,13 +125,14 @@ public class CommandManager {
             ChatUtils.addChatMessage("§cFailed to delete profile '" + profileName + "'.");
         }
     }
-    
+
     private void handleHelpCommand() {
         ChatUtils.addChatMessage("§b=== Volt Config Commands ===");
         ChatUtils.addChatMessage("§7.save <name> §f- Save current config as profile");
         ChatUtils.addChatMessage("§7.save <name> -override §f- Override existing profile");
         ChatUtils.addChatMessage("§7.load <name> §f- Load a saved profile");
         ChatUtils.addChatMessage("§7.profiles §f- List all saved profiles");
+        ChatUtils.addChatMessage("§7.profiles folder §f- Open the profiles folder in your system");
         ChatUtils.addChatMessage("§7.deleteprofile <name> §f- Delete a profile");
         ChatUtils.addChatMessage("§7.help §f- Show this help message");
     }

@@ -11,7 +11,6 @@ import com.volt.module.setting.NumberSetting;
 import com.volt.module.setting.StringSetting;
 import com.volt.utils.font.FontManager;
 import com.volt.utils.font.fonts.FontRenderer;
-import com.volt.gui.utils.render.MSAARoundedRectShader;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Formatting;
@@ -75,19 +74,15 @@ public class HUDModule extends Module {
                          
                          Color watermarkColor = switch (colorMode.getMode()) {
                              case "Astolfo" -> new Color(getAstolfo(0));
-                             case "Theme" -> getThemeColor();
                              case "Custom" -> getCustomColor();
                              default -> getThemeColor();
                          };
-                         
-                         switch (watermarkSimpleFontMode.getMode()) {
-                             case "MC":
-                                 event.getContext().drawText(mc.textRenderer, totalWatermarkText, scaledX, scaledY, watermarkColor.getRGB(), true);
-                                 break;
-                             default:
-                                 getWatermarkFontRenderer(watermarkSimpleFontMode.getMode()).drawString(event.getContext().getMatrices(), totalWatermarkText, scaledX, scaledY, watermarkColor);
-                                 break;
-                         }
+
+                        if (watermarkSimpleFontMode.getMode().equals("MC")) {
+                            event.getContext().drawText(mc.textRenderer, totalWatermarkText, scaledX, scaledY, watermarkColor.getRGB(), true);
+                        } else {
+                            getWatermarkFontRenderer(watermarkSimpleFontMode.getMode()).drawString(event.getContext().getMatrices(), totalWatermarkText, scaledX, scaledY, watermarkColor);
+                        }
                     }
                     break;
 
@@ -122,7 +117,6 @@ public class HUDModule extends Module {
 
                      Color gamesenseColor = switch (colorMode.getMode()) {
                          case "Astolfo" -> new Color(getAstolfo(0));
-                         case "Theme" -> getThemeColor();
                          case "Custom" -> getCustomColor();
                          default -> getThemeColor();
                      };
@@ -145,15 +139,12 @@ public class HUDModule extends Module {
                  if (hideVisuals.getValue() && module.getModuleCategory() == Category.RENDER) continue;
                  enabledModules.add(module);
              }
-             
-             switch (fontMode.getMode()) {
-                 case "MC":
-                     enabledModules.sort(Comparator.comparingDouble(ri -> -mc.textRenderer.getWidth(getFullName(ri))));
-                     break;
-                 default:
-                     enabledModules.sort(Comparator.comparingDouble(ri -> -getCustomFontRenderer(fontMode.getMode()).getStringWidth(getFullName(ri))));
-                     break;
-             }
+
+            if (fontMode.getMode().equals("MC")) {
+                enabledModules.sort(Comparator.comparingDouble(ri -> -mc.textRenderer.getWidth(getFullName(ri))));
+            } else {
+                enabledModules.sort(Comparator.comparingDouble(ri -> -getCustomFontRenderer(fontMode.getMode()).getStringWidth(getFullName(ri))));
+            }
 
              int i = padding.getValueInt();
             int totalWidth = event.getWidth();
@@ -161,13 +152,10 @@ public class HUDModule extends Module {
              for (Module m : enabledModules) {
                  int moduleHeight;
 
-                 switch (fontMode.getMode()) {
-                     case "MC":
-                         moduleHeight = mc.textRenderer.fontHeight;
-                         break;
-                     default:
-                         moduleHeight = (int) getCustomFontRenderer(fontMode.getMode()).getStringHeight(getFullName(m));
-                         break;
+                 if (fontMode.getMode().equals("MC")) {
+                     moduleHeight = mc.textRenderer.fontHeight;
+                 } else {
+                     moduleHeight = (int) getCustomFontRenderer(fontMode.getMode()).getStringHeight(getFullName(m));
                  }
 
                  i += moduleHeight + (int) (3 * arrayListScale.getValue());
@@ -186,33 +174,19 @@ public class HUDModule extends Module {
                  int moduleWidth;
                  int moduleHeight;
 
-                 switch (fontMode.getMode()) {
-                     case "MC":
-                         moduleWidth = mc.textRenderer.getWidth(getFullName(m));
-                         moduleHeight = mc.textRenderer.fontHeight;
-                         break;
-                     default:
-                         moduleWidth = (int) getCustomFontRenderer(fontMode.getMode()).getStringWidth(getFullName(m));
-                         moduleHeight = (int) getCustomFontRenderer(fontMode.getMode()).getStringHeight(getFullName(m));
-                         break;
+                 if (fontMode.getMode().equals("MC")) {
+                     moduleWidth = mc.textRenderer.getWidth(getFullName(m));
+                     moduleHeight = mc.textRenderer.fontHeight;
+                 } else {
+                     moduleWidth = (int) getCustomFontRenderer(fontMode.getMode()).getStringWidth(getFullName(m));
+                     moduleHeight = (int) getCustomFontRenderer(fontMode.getMode()).getStringHeight(getFullName(m));
                  }
 
                  int scaledPadding2 = (int) (2 * arrayListScale.getValue());
                  int scaledPadding1 = (int) (1 * arrayListScale.getValue());
                  int scaledPadding3 = (int) (3 * arrayListScale.getValue());
                  int scaledPadding5 = (int) (5 * arrayListScale.getValue());
-                 int bgX = totalWidth - moduleWidth - padding.getValueInt() - scaledPadding2;
-                 int bgY = i - scaledPadding2;
-                 int bgW = (totalWidth - padding.getValueInt() + scaledPadding2) - bgX;
-                 int bgH = (i + moduleHeight + scaledPadding1) - bgY;
 
-                 int cornerRadius = Math.max(3, (int) Math.round(3 * arrayListScale.getValue()));
-
-                 MSAARoundedRectShader shader = MSAARoundedRectShader.getInstance();
-                 float spread = 1.5f;
-                 Color shadowCol = new Color(0, 0, 0, Math.min(70, (int) (opacity.getValueInt() * 0.5)));
-                 shader.drawRoundedRect(bgX - spread / 2f, bgY - spread / 2f, bgW + spread, bgH + spread, cornerRadius + spread / 2f, shadowCol, 8);
-                 shader.drawRoundedRect(bgX, bgY, bgW, bgH, cornerRadius, new Color(0, 0, 0, opacity.getValueInt()), 8);
                  switch (backBarMode.getMode()) {
                      case "Full":
                          event.getContext().fill(totalWidth - padding.getValueInt() + scaledPadding3, i - scaledPadding2, totalWidth - padding.getValueInt() + scaledPadding5, i + moduleHeight + scaledPadding1, color);
@@ -222,13 +196,10 @@ public class HUDModule extends Module {
                          break;
                  }
 
-                 switch (fontMode.getMode()) {
-                     case "MC":
-                         event.getContext().drawText(mc.textRenderer, getFullName(m), totalWidth - moduleWidth - padding.getValueInt(), i, color, true);
-                         break;
-                     default:
-                         getCustomFontRenderer(fontMode.getMode()).drawString(event.getContext().getMatrices(), getFullName(m), totalWidth - moduleWidth - padding.getValueInt(), i, new Color(color));
-                         break;
+                 if (fontMode.getMode().equals("MC")) {
+                     event.getContext().drawText(mc.textRenderer, getFullName(m), totalWidth - moduleWidth - padding.getValueInt(), i, color, true);
+                 } else {
+                     getCustomFontRenderer(fontMode.getMode()).drawString(event.getContext().getMatrices(), getFullName(m), totalWidth - moduleWidth - padding.getValueInt(), i, new Color(color));
                  }
                  i += moduleHeight + (int) (3 * arrayListScale.getValue());
              }
@@ -265,12 +236,11 @@ public class HUDModule extends Module {
                 event.getContext().drawText(mc.textRenderer, "BPS: " + bps, x, y, color, true);
             }
         }
-    };
+    }
 
     private FontRenderer getCustomFontRenderer(String name) {
         int scaledSize = (int) (16 * arrayListScale.getValue());
         return switch (name) {
-            case "Inter" -> Volt.INSTANCE.fontManager.getSize(scaledSize, FontManager.Type.Inter);
             case "JetbrainsMono" -> Volt.INSTANCE.fontManager.getSize(scaledSize, FontManager.Type.JetbrainsMono);
             case "Poppins" -> Volt.INSTANCE.fontManager.getSize(scaledSize, FontManager.Type.Poppins);
             default -> Volt.INSTANCE.fontManager.getSize(scaledSize, FontManager.Type.Inter);
@@ -280,7 +250,6 @@ public class HUDModule extends Module {
     private FontRenderer getWatermarkFontRenderer(String name) {
         int scaledSize = 16;
         return switch (name) {
-            case "Inter" -> Volt.INSTANCE.fontManager.getSize(scaledSize, FontManager.Type.Inter);
             case "JetbrainsMono" -> Volt.INSTANCE.fontManager.getSize(scaledSize, FontManager.Type.JetbrainsMono);
             case "Poppins" -> Volt.INSTANCE.fontManager.getSize(scaledSize, FontManager.Type.Poppins);
             default -> Volt.INSTANCE.fontManager.getSize(scaledSize, FontManager.Type.Inter);
@@ -345,14 +314,11 @@ public class HUDModule extends Module {
     }
 
     private Color getThemeColor(int variant) {
-        switch (variant) {
-            case 1:
-                return new Color(200, 0, 255);
-            case 2:
-                return new Color(100, 0, 255);
-            default:
-                return getThemeColor();
-        }
+        return switch (variant) {
+            case 1 -> new Color(200, 0, 255);
+            case 2 -> new Color(100, 0, 255);
+            default -> getThemeColor();
+        };
     }
 
     private Color getCustomColor() {
