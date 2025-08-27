@@ -18,7 +18,8 @@ public final class ProfileManager {
 
     private final ModuleManager moduleManager = Volt.INSTANCE.getModuleManager();
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private final File profileDir = new File(System.getProperty("user.home") + File.separator + "AppData" + File.separator + "Roaming" + File.separator + ".minecraft" + File.separator + "Volt" + File.separator + "profiles");
+    private final File profileDir = new File(Volt.mc.runDirectory, "Volt" + File.separator + "profiles");
+
 
     public ProfileManager() {
         createProfileDirectoryIfNeeded();
