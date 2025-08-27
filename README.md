@@ -1,3 +1,4 @@
+https://discord.gg/qwKegVhc9H
 # OpenVolt
 
 A 1.21.1 client (for 1.9 combat).
@@ -19,3 +20,11 @@ Koi (1227992566339731479) – The best person I could have met, helped a lot wit
 Etho (1383737664645369926) – Moral support & Walmart Solutions
 
 3000IQPlay (1193266310977691760) – Gave me help on what to do with Volt (also made Walmart Solutions, which made me try 1.21)
+
+# How to Contribute? 
+Either join the discord and DM me or make a pull request!
+I won't accept pull requests which refactor a lot of packages or are utterly pointless.
+
+# Before pasting!
+
+Don't sell this please or at least credit Koi, Walper and me before taking our code! Thanks.
