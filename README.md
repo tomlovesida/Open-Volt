@@ -26,6 +26,16 @@ Either join the discord and DM me or make a pull request!
 I won't accept pull requests which refactor a lot of packages or are utterly pointless.
 (All Blatant features will get declined.)
 
+# Commit rules
+
+ U can change the GUI but please make sure it is as a option and not by default
+ Please make sure u test your feature before sending a commit request (make sure it bypasses)
+ make sure your using  isNull ect 
+ No blatant features
+ No useless features
+ not allowed to modify the folder structure of the client
+
+
 # Before pasting!
 
 Don't sell this please or at least credit Koi, Walper and me before taking our code! Thanks.
