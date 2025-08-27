@@ -107,6 +107,7 @@ public final class ModuleManager {
         // Misc
         add(new CartKeyModule());
         add(new HoverTotemModule());
+        add(new AutoRetotemModule());
         add(new MiddleClickFriendModule());
         add(new PearlKeyModule());
         add(new WindChargeKeyModule());
