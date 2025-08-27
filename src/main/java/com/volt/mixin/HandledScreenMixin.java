@@ -1,0 +1,38 @@
+package com.volt.mixin;
+
+import com.volt.Volt;
+import com.volt.module.modules.render.ContainerSlots;
+import com.volt.utils.font.FontManager;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.screen.slot.Slot;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.awt.*;
+
+import static com.volt.Volt.mc;
+
+@Mixin(HandledScreen.class)
+public class HandledScreenMixin {
+    @Inject(method = "drawSlot", at = @At("TAIL"))
+    public void postDrawSlot(DrawContext context, Slot slot, CallbackInfo ci) {
+        if (!Volt.INSTANCE.moduleManager.getModule(ContainerSlots.class).isEnabled()) return;
+        if (ContainerSlots.fontMode.isMode("Inter")) {
+            Volt.INSTANCE.fontManager
+                    .getSize(10, FontManager.Type.Inter)
+                    .drawString(context.getMatrices(), String.valueOf(slot.getIndex()), slot.x, slot.y, ContainerSlots.color.getValue());
+        } else {
+            context.drawText(
+                    mc.textRenderer,
+                    String.valueOf(slot.getIndex()),
+                    slot.x,
+                    slot.y,
+                    ContainerSlots.color.getValue().getRGB(),
+                    false
+            );
+        }
+    }
+}

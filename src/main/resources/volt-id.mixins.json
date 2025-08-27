@@ -1,0 +1,29 @@
+{
+  "required": true,
+  "package": "com.volt.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "ChatScreenMixin",
+    "ExampleMixin",
+    "HandledScreenMixin",
+    "InGameHudMixin",
+    "KeyboardMixin",
+    "LivingEntityMixin",
+    "MinecraftClientAccessor",
+    "MinecraftClientMixin",
+    "MixinClientConnection",
+    "MouseMixin",
+    "ScreenMixin",
+    "WorldRendererMixin",
+    "ClientPlayerInteractionManagerMixin",
+    "PlayerEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "ClientPlayNetworkHandlerMixin",
+    "HandledScreenAccessor",
+    "LightmapTextureManagerMixin"
+  ]
+}
