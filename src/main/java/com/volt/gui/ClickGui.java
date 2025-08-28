@@ -301,7 +301,6 @@ public final class ClickGui extends Screen {
                 int settingsHeight = renderModuleSettings(context, module, x, moduleY, width, newDropdown);
                 moduleY += (int)(newDropdown * settingsHeight);
             }
-            
         }
       
         context.disableScissor();
@@ -314,10 +313,6 @@ public final class ClickGui extends Screen {
     private int renderModuleSettings(DrawContext context, Module module, int x, int moduleY, int width, float animation) {
         return SettingsRenderer.renderModuleSettings(context, module, x, moduleY, width, animation, smallFont, eventHandler.getDropdownExpanded(), eventHandler);
     }
-    
-
-    
-    
     
     private boolean handleColorPickerClicks(double mouseX, double mouseY, int button) {
         return colorPickerManager.handleColorPickerClicks(mouseX, mouseY, button);
