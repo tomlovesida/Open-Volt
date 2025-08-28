@@ -27,6 +27,7 @@ public class GuiEventHandler {
     private boolean wasListeningKeybind = false;
     private Category selectedCategory;
     private int scrollOffset = 0;
+    private int maxScrollOffset = 0; 
     private boolean dragging = false;
     private double lastMouseY = 0;
     private String searchQuery = "";
@@ -381,14 +382,16 @@ public class GuiEventHandler {
         return false;
     }
     
-    public boolean handleScroll(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+    public boolean handleScroll(double mouseX, double mouseY, double horizontalAmount, double verticalAmount, List<Module> modules) {
         scrollOffset -= (int)(verticalAmount * 20);
-        scrollOffset = Math.max(0, scrollOffset);
+        scrollOffset = Math.max(0, Math.min(scrollOffset, maxScrollOffset));
         return true;
     }
     
     public boolean handleMouseScroll(double mouseX, double mouseY, double horizontalAmount, double verticalAmount, int screenHeight) {
-        return handleScroll(mouseX, mouseY, horizontalAmount, verticalAmount);
+        scrollOffset -= (int)(verticalAmount * 20);
+        scrollOffset = Math.max(0, Math.min(scrollOffset, maxScrollOffset));
+        return true;
     }
     
     private int getModuleSettingsHeight(Module module) {
@@ -405,6 +408,10 @@ public class GuiEventHandler {
         }
         
         return settingsHeight;
+    }
+
+    public void updateMaxScrollOffset(int totalContentHeight, int visibleHeight) {
+        maxScrollOffset = Math.max(0, totalContentHeight - visibleHeight);
     }
     
     public Category getSelectedCategory() {

@@ -234,12 +234,15 @@ public final class ClickGui extends Screen {
         List<Module> modules = filterModulesBySearch(allModules);
         
         int moduleY = y + HEADER_HEIGHT + PADDING - eventHandler.getScrollOffset();
+        int totalContentHeight = PADDING;
         
         for (Module module : modules) {
             int moduleHeight = MODULE_HEIGHT + 5;
             if (moduleExpanded.get(module)) {
                 moduleHeight += (int)(animationManager.getDropdownAnimation(module) * SettingsRenderer.getModuleSettingsHeight(module, SETTING_HEIGHT, eventHandler));
             }
+            
+            totalContentHeight += moduleHeight;
             
             if (moduleY + moduleHeight < y + HEADER_HEIGHT) {
                 moduleY += moduleHeight;
@@ -303,6 +306,10 @@ public final class ClickGui extends Screen {
             }
         }
       
+        totalContentHeight += PADDING; 
+        int visibleHeight = height - HEADER_HEIGHT;
+        eventHandler.updateMaxScrollOffset(totalContentHeight, visibleHeight);
+        
         context.disableScissor();
     }
     
