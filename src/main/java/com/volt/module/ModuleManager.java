@@ -1,16 +1,16 @@
 package com.volt.module;
 
 import com.volt.module.modules.client.ClickGUIModule;
-import com.volt.module.modules.client.ClientModule;
-import com.volt.module.modules.client.PanicModule;
+import com.volt.module.modules.client.Client;
+import com.volt.module.modules.client.Panic;
 import com.volt.module.modules.combat.*;
 import com.volt.module.modules.misc.*;
-import com.volt.module.modules.movement.AutoFireworkModule;
-import com.volt.module.modules.movement.AutoHeadHitterModule;
-import com.volt.module.modules.movement.SprintModule;
+import com.volt.module.modules.movement.AutoFirework;
+import com.volt.module.modules.movement.AutoHeadHitter;
+import com.volt.module.modules.movement.Sprint;
 import com.volt.module.modules.player.*;
 import com.volt.module.modules.render.*;
-import com.volt.module.modules.render.FPSCounterModule;
+import com.volt.module.modules.render.FpsCounter;
 import lombok.Getter;
 
 import java.util.*;
@@ -47,38 +47,38 @@ public final class ModuleManager {
     private void addModules() {
         // Combat
         add(
-                new AutoMaceModule(), new TotemHitModule(), new TriggerBotModule(), new VelocityModule(),
-                new ShieldBreakerModule(), new ThrowPotModule(), new ElytraHotSwapModule(), new KeyCrystalModule(),
-                new KeyAnchorModule(), new AntiMissModule(), new WTapModule(), new STapModule(),
-                new AimAssistModule(), new SwordHotSwap()
+                new AutoMace(), new TotemHit(), new TriggerBot(), new Velocity(),
+                new ShieldBreaker(), new ThrowPot(), new ElytraHotSwap(), new KeyCrystal(),
+                new KeyAnchor(), new AntiMiss(), new WTap(), new STap(),
+                new AimAssist(), new SwordHotSwap()
         );
 
         // Movement
-        add(new SprintModule(), new AutoFireworkModule(), new AutoHeadHitterModule());
+        add(new Sprint(), new AutoFirework(), new AutoHeadHitter());
 
         // Player
         add(
-                new AutoExtinguishModule(), new AutoToolModule(), new AutoWebModule(), new AutoRefillModule(),
-                new AutoDrainModule(), new AutoCrafterModule(), new FastPlaceModule(), new FastExpModule(),
-                new EagleModule(), new TrapSaveModule(), new PingSpoofModule(), new AutoDoubleHandModule(),
-                new FastMineModule()
+                new AutoExtinguish(), new AutoTool(), new AutoWeb(), new AutoRefill(),
+                new AutoDrain(), new AutoCrafter(), new FastPlace(), new FastEXP(),
+                new Eagle(), new TrapSave(), new PingSpoof(), new AutoDoubleHand(),
+                new FastMine()
         );
 
         // Render
         add(
-                new ContainerSlots(), new FullBright(), new HUDModule(), new PlayerESPModule(),
-                new SwingSpeedModule(), new OreESP(), new TrajectoryModule(), new FPSCounterModule()
+                new ContainerSlots(), new FullBright(), new HUD(), new PlayerESP(),
+                new SwingSpeed(), new OreESP(), new Trajectory(), new FpsCounter()
         );
 
         // Misc
         add(
-                new CartKeyModule(), new HoverTotemModule(), new AutoRetotemModule(),
-                new MiddleClickFriendModule(), new PearlKeyModule(), new WindChargeKeyModule(),
-                new TeamsModule(), new FakePlayerModule()
+                new CartKey(), new HoverTotem(), new AutoRetotem(),
+                new MiddleClickFriend(), new PearlKey(), new WindChargeKey(),
+                new Teams(), new FakePlayer()
         );
 
         // Client
-        add(new ClickGUIModule(), new ClientModule(), new PanicModule());
+        add(new ClickGUIModule(), new Client(), new Panic());
     }
 
     private void add(Module... mods) {

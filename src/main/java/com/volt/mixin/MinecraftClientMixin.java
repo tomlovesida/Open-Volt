@@ -6,7 +6,7 @@ import com.volt.event.impl.player.TickEvent;
 import com.volt.event.impl.world.WorldChangeEvent;
 import com.volt.gui.ClickGui;
 import com.volt.module.modules.client.ClickGUIModule;
-import com.volt.module.modules.client.ClientModule;
+import com.volt.module.modules.client.Client;
 import com.volt.profiles.ProfileManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
@@ -27,10 +27,10 @@ public class MinecraftClientMixin implements IMinecraft {
     public void setTitle(CallbackInfoReturnable<String> cir) {
         if (Volt.INSTANCE == null || Volt.mc == null) return;
 
-        var optionalClientModule = Volt.INSTANCE.getModuleManager().getModule(ClientModule.class);
+        var optionalClientModule = Volt.INSTANCE.getModuleManager().getModule(Client.class);
         if (optionalClientModule.isPresent()) {
-            ClientModule clientModule = optionalClientModule.get();
-            if (clientModule.isEnabled() && clientModule.getTitle()) {
+            Client client = optionalClientModule.get();
+            if (client.isEnabled() && client.getTitle()) {
                 cir.setReturnValue("Volt 1.21");
             }
         }

@@ -1,7 +1,7 @@
 package com.volt.mixin;
 
 import com.volt.Volt;
-import com.volt.module.modules.player.FastMineModule;
+import com.volt.module.modules.player.FastMine;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,10 +19,10 @@ public class PlayerEntityMixin {
     private void modifyBlockBreakingSpeed(BlockState block, CallbackInfoReturnable<Float> cir) {
         if (Volt.INSTANCE == null) return;
 
-        Optional<FastMineModule> optionalModule = Volt.INSTANCE.getModuleManager().getModule(FastMineModule.class);
+        Optional<FastMine> optionalModule = Volt.INSTANCE.getModuleManager().getModule(FastMine.class);
         if (optionalModule.isEmpty()) return;
 
-        FastMineModule fastMine = optionalModule.get();
+        FastMine fastMine = optionalModule.get();
         if (!fastMine.isEnabled()) return;
 
         PlayerEntity player = (PlayerEntity) (Object) this;
