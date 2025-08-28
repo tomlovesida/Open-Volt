@@ -9,7 +9,7 @@ public class FastMine extends Module {
     private final NumberSetting speed = new NumberSetting("Speed", 1, 10, 5, 0.5);
 
     public FastMine() {
-        super("FastMine", "Mine blocks faster", -1, Category.PLAYER);
+        super("Fast Mine", "Mine blocks faster", -1, Category.PLAYER);
         addSettings(speed);
     }
 

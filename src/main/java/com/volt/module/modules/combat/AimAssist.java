@@ -17,6 +17,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.SwordItem;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
@@ -41,7 +43,6 @@ public class AimAssist extends Module {
     private Entity currentTarget = null;
     private long lastUpdateTime = 0;
     float noiseTime = 0f;
-    TimerUtil timer = new TimerUtil();
 
     public AimAssist() {
         super("Aim Assist", "Helps you with aiming", Category.COMBAT);
@@ -54,7 +55,15 @@ public class AimAssist extends Module {
         
         if (weaponsOnly.getValue() && !isHoldingWeapon()) return;
         if (mc.currentScreen != null) return;
-        
+        HitResult hit = mc.crosshairTarget;
+
+        if (disableOnTarget.getValue() && hit != null && hit.getType() == HitResult.Type.ENTITY) {
+            EntityHitResult entityHit = (EntityHitResult) hit;
+            if (entityHit.getEntity() == currentTarget) {
+                return;
+            }
+        }
+
         currentTarget = findBestTarget();
         
         if (currentTarget != null) {

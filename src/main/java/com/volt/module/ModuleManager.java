@@ -50,7 +50,7 @@ public final class ModuleManager {
                 new AutoMace(), new TotemHit(), new TriggerBot(), new Velocity(),
                 new ShieldBreaker(), new ThrowPot(), new ElytraHotSwap(), new KeyCrystal(),
                 new KeyAnchor(), new AntiMiss(), new WTap(), new STap(),
-                new AimAssist(), new SwordHotSwap()
+                new AimAssist(), new SwordHotSwap(), new AutoCrystal()
         );
 
         // Movement
