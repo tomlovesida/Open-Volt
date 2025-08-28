@@ -2,6 +2,7 @@ package com.volt.module;
 
 import com.volt.module.modules.client.ClickGUIModule;
 import com.volt.module.modules.client.Client;
+import com.volt.module.modules.client.Debugger;
 import com.volt.module.modules.client.Panic;
 import com.volt.module.modules.combat.*;
 import com.volt.module.modules.misc.*;
@@ -10,10 +11,12 @@ import com.volt.module.modules.movement.AutoHeadHitter;
 import com.volt.module.modules.movement.Sprint;
 import com.volt.module.modules.player.*;
 import com.volt.module.modules.render.*;
-import com.volt.module.modules.render.FpsCounter;
 import lombok.Getter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Getter
@@ -72,13 +75,12 @@ public final class ModuleManager {
 
         // Misc
         add(
-                new CartKey(), new HoverTotem(), new AutoRetotem(),
-                new MiddleClickFriend(), new PearlKey(), new WindChargeKey(),
-                new Teams(), new FakePlayer()
+                new CartKey(), new HoverTotem(), new MiddleClickFriend(),
+                new PearlKey(), new WindChargeKey(), new Teams(), new FakePlayer()
         );
 
         // Client
-        add(new ClickGUIModule(), new Client(), new Panic());
+        add(new ClickGUIModule(), new Client(), new Panic(), new Debugger());
     }
 
     private void add(Module... mods) {

@@ -30,7 +30,7 @@ public class CommandManager {
         switch (command) {
             case "save", "saveconfig" -> handleSaveCommand(args);
             case "load", "loadconfig" -> handleLoadCommand(args);
-            case "profiles", "listprofiles" -> handleListProfilesCommand(args);
+            case "profiles", "listprofiles" -> handleListProfilesCommand();
             case "deleteprofile" -> handleDeleteProfileCommand(args);
             case "help", "commands" -> handleHelpCommand();
             default ->
@@ -60,22 +60,11 @@ public class CommandManager {
         profileManager.loadProfile(profileName);
     }
 
-    private void handleListProfilesCommand(final String[] args) {
+    private void handleListProfilesCommand() {
         final File profileDir = profileManager.getProfileDir();
 
         if (!profileDir.exists() || !profileDir.isDirectory()) {
             ChatUtils.addChatMessage("§cNo profiles directory found.");
-            return;
-        }
-
-        if (args.length > 1 && args[1].equalsIgnoreCase("folder")) {
-            try {
-                java.awt.Desktop.getDesktop().open(profileDir);
-                ChatUtils.addChatMessage("§aOpened profiles folder!");
-            } catch (Exception e) {
-                ChatUtils.addChatMessage("§cFailed to open profiles folder.");
-                e.printStackTrace();
-            }
             return;
         }
 
@@ -90,6 +79,7 @@ public class CommandManager {
             ChatUtils.addChatMessage("§7- " + profile.getName().replace(".json", ""));
         }
     }
+
 
     private void handleDeleteProfileCommand(final String[] args) {
         if (args.length < 2) {
@@ -118,7 +108,6 @@ public class CommandManager {
         ChatUtils.addChatMessage("§7.save <name> -override §f- Override existing profile");
         ChatUtils.addChatMessage("§7.load <name> §f- Load a saved profile");
         ChatUtils.addChatMessage("§7.profiles §f- List all saved profiles");
-        ChatUtils.addChatMessage("§7.profiles folder §f- Open the profiles folder in your system");
         ChatUtils.addChatMessage("§7.deleteprofile <name> §f- Delete a profile");
         ChatUtils.addChatMessage("§7.help §f- Show this help message");
     }

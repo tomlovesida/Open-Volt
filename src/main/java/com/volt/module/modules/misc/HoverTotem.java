@@ -41,8 +41,6 @@ public final class HoverTotem extends Module {
         totemHandler();
     }
 
-    ;
-
     private void totemHandler() {
         if (isNull()) return;
         if (!(mc.currentScreen instanceof InventoryScreen inv)) return;
