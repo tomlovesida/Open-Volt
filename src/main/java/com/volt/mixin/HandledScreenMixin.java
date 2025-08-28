@@ -20,7 +20,7 @@ import static com.volt.Volt.mc;
 public class HandledScreenMixin {
     @Inject(method = "drawSlot", at = @At("TAIL"))
     public void postDrawSlot(DrawContext context, Slot slot, CallbackInfo ci) {
-        if (!Volt.INSTANCE.moduleManager.getModule(ContainerSlots.class).isEnabled()) return;
+        if (!Volt.INSTANCE.moduleManager.getModule(ContainerSlots.class).get().isEnabled()) return;
 
         Color textColor = ContainerSlots.color.getValue();
 

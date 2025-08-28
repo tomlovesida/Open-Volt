@@ -33,7 +33,7 @@ public final class PearlKeyModule extends Module {
     private void onTickEvent(TickEvent event) {
         if (isNull()) return;
         if (mc.currentScreen != null) return;
-        boolean currentKeyState = KeyUtils.isKeyPressed(pearlKeybind.getKey());
+        boolean currentKeyState = KeyUtils.isKeyPressed(pearlKeybind.getKeyCode());
 
         if (currentKeyState && !keyPressed) {
             handlePearlThrow();

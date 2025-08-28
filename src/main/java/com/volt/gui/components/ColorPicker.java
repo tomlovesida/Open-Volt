@@ -50,7 +50,7 @@ public class ColorPicker {
         int brightnessX = x + SIZE + SPACING;
         renderGradientBar(context, brightnessX, y, SIZE, true);
         
-        if (colorSetting.hasAlpha()) {
+        if (colorSetting.isHasAlpha()) {
             int alphaX = brightnessX + BAR_WIDTH + SPACING;
             renderGradientBar(context, alphaX, y, SIZE, false);
         }
@@ -131,7 +131,7 @@ public class ColorPicker {
     }
     
     private void renderColorPreview(DrawContext context, int x, int y) {
-        if (colorSetting.hasAlpha()) renderCheckerboard(context, x, y, PREVIEW_SIZE, PREVIEW_SIZE);
+        if (colorSetting.isHasAlpha()) renderCheckerboard(context, x, y, PREVIEW_SIZE, PREVIEW_SIZE);
         
         Color color = colorSetting.getValue();
         context.fill(x, y, x + PREVIEW_SIZE, y + PREVIEW_SIZE, color.getRGB());
@@ -148,7 +148,7 @@ public class ColorPicker {
         int brightnessY = (int) (y + (1 - hsb[2]) * SIZE);
         drawBarIndicator(context, brightnessX, brightnessY, BAR_WIDTH);
         
-        if (colorSetting.hasAlpha()) {
+        if (colorSetting.isHasAlpha()) {
             int alphaX = brightnessX + BAR_WIDTH + SPACING;
             int alphaY = (int) (y + (1 - colorSetting.getAlpha() / 255f) * SIZE);
             drawBarIndicator(context, alphaX, alphaY, BAR_WIDTH);
@@ -229,7 +229,7 @@ public class ColorPicker {
             return true;
         }
         
-        if (colorSetting.hasAlpha()) {
+        if (colorSetting.isHasAlpha()) {
             int alphaX = brightnessX + barWidth + spacing;
             if (isInBounds(mouseX, mouseY, alphaX, posY, barWidth, size)) {
                 isDraggingAlpha = true;
@@ -246,7 +246,7 @@ public class ColorPicker {
         if (isInBounds(mouseX, mouseY, gBoxX, gBoxY, gBoxW, gBoxH)) { setFocus(false, false, true, false, false); return true; }
         if (isInBounds(mouseX, mouseY, bSliderX, bSliderY, bSliderW, bSliderH)) { draggingB = true; updateBFromMouse(mouseX); return true; }
         if (isInBounds(mouseX, mouseY, bBoxX, bBoxY, bBoxW, bBoxH)) { setFocus(false, false, false, true, false); return true; }
-        if (colorSetting.hasAlpha()) {
+        if (colorSetting.isHasAlpha()) {
             if (isInBounds(mouseX, mouseY, aSliderX, aSliderY, aSliderW, aSliderH)) { draggingA = true; updateAFromMouse(mouseX); return true; }
             if (isInBounds(mouseX, mouseY, aBoxX, aBoxY, aBoxW, aBoxH)) { setFocus(false, false, false, false, true); return true; }
         }
@@ -342,7 +342,7 @@ public class ColorPicker {
         drawTextField(context, bBoxX, bBoxY, bBoxW, bBoxH, inputB.isEmpty() ? String.valueOf(colorSetting.getBlue()) : inputB, focusB);
         rowY += CONTROL_HEIGHT + CONTROL_SPACING;
 
-        if (colorSetting.hasAlpha()) {
+        if (colorSetting.isHasAlpha()) {
             context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, "A", x, rowY + 3, textColor);
             aSliderX = sliderX; aSliderY = rowY + (CONTROL_HEIGHT - sliderH) / 2; aSliderW = sliderW; aSliderH = sliderH;
             UIRenderer.renderSlider(context, aSliderX, aSliderY, aSliderW, aSliderH, colorSetting.getAlpha() / 255.0, new Color(60,60,60), new Color(200,200,200));
@@ -364,14 +364,14 @@ public class ColorPicker {
         if (!focusR) inputR = String.valueOf(c.getRed());
         if (!focusG) inputG = String.valueOf(c.getGreen());
         if (!focusB) inputB = String.valueOf(c.getBlue());
-        if (colorSetting.hasAlpha() && !focusA) inputA = String.valueOf(c.getAlpha());
+        if (colorSetting.isHasAlpha() && !focusA) inputA = String.valueOf(c.getAlpha());
         if (!focusHex) inputHex = colorToHexDisplay();
     }
 
     private String colorToHexDisplay() {
         Color c = colorSetting.getValue();
         String base = String.format("#%02X%02X%02X", c.getRed(), c.getGreen(), c.getBlue());
-        if (colorSetting.hasAlpha()) base += String.format("%02X", c.getAlpha());
+        if (colorSetting.isHasAlpha()) base += String.format("%02X", c.getAlpha());
         return base;
     }
 
@@ -395,16 +395,16 @@ public class ColorPicker {
                     int r = Integer.parseInt(s.substring(0, 2), 16);
                     int g = Integer.parseInt(s.substring(2, 4), 16);
                     int b = Integer.parseInt(s.substring(4, 6), 16);
-                    int a = colorSetting.hasAlpha() ? (s.length() == 8 ? Integer.parseInt(s.substring(6, 8), 16) : colorSetting.getAlpha()) : 255;
-                    if (colorSetting.hasAlpha()) colorSetting.setValue(r, g, b, a); else colorSetting.setValue(r, g, b);
+                    int a = colorSetting.isHasAlpha() ? (s.length() == 8 ? Integer.parseInt(s.substring(6, 8), 16) : colorSetting.getAlpha()) : 255;
+                    if (colorSetting.isHasAlpha()) colorSetting.setValue(r, g, b, a); else colorSetting.setValue(r, g, b);
                 }
             } else {
                 String rS = inputR, gS = inputG, bS = inputB, aS = inputA;
-                if (!rS.isEmpty() || !gS.isEmpty() || !bS.isEmpty() || (colorSetting.hasAlpha() && !aS.isEmpty())) {
+                if (!rS.isEmpty() || !gS.isEmpty() || !bS.isEmpty() || (colorSetting.isHasAlpha() && !aS.isEmpty())) {
                     int r = rS.isEmpty() ? colorSetting.getRed() : Integer.parseInt(clampNumeric(rS));
                     int g = gS.isEmpty() ? colorSetting.getGreen() : Integer.parseInt(clampNumeric(gS));
                     int b = bS.isEmpty() ? colorSetting.getBlue() : Integer.parseInt(clampNumeric(bS));
-                    if (colorSetting.hasAlpha()) {
+                    if (colorSetting.isHasAlpha()) {
                         int a = aS.isEmpty() ? colorSetting.getAlpha() : Integer.parseInt(clampNumeric(aS));
                         colorSetting.setValue(r, g, b, a);
                     } else {
@@ -466,17 +466,17 @@ public class ColorPicker {
     private void updateRFromMouse(double mouseX) {
         double t = (mouseX - rSliderX) / Math.max(1, rSliderW);
         int v = (int) Math.round(Math.max(0, Math.min(1, t)) * 255);
-        colorSetting.setValue(v, colorSetting.getGreen(), colorSetting.getBlue(), colorSetting.hasAlpha() ? colorSetting.getAlpha() : 255);
+        colorSetting.setValue(v, colorSetting.getGreen(), colorSetting.getBlue(), colorSetting.isHasAlpha() ? colorSetting.getAlpha() : 255);
     }
     private void updateGFromMouse(double mouseX) {
         double t = (mouseX - gSliderX) / Math.max(1, gSliderW);
         int v = (int) Math.round(Math.max(0, Math.min(1, t)) * 255);
-        colorSetting.setValue(colorSetting.getRed(), v, colorSetting.getBlue(), colorSetting.hasAlpha() ? colorSetting.getAlpha() : 255);
+        colorSetting.setValue(colorSetting.getRed(), v, colorSetting.getBlue(), colorSetting.isHasAlpha() ? colorSetting.getAlpha() : 255);
     }
     private void updateBFromMouse(double mouseX) {
         double t = (mouseX - bSliderX) / Math.max(1, bSliderW);
         int v = (int) Math.round(Math.max(0, Math.min(1, t)) * 255);
-        colorSetting.setValue(colorSetting.getRed(), colorSetting.getGreen(), v, colorSetting.hasAlpha() ? colorSetting.getAlpha() : 255);
+        colorSetting.setValue(colorSetting.getRed(), colorSetting.getGreen(), v, colorSetting.isHasAlpha() ? colorSetting.getAlpha() : 255);
     }
     private void updateAFromMouse(double mouseX) {
         double t = (mouseX - aSliderX) / Math.max(1, aSliderW);
@@ -487,13 +487,13 @@ public class ColorPicker {
     
     
     public int getWidth() {
-        return SIZE + SPACING + BAR_WIDTH + (colorSetting.hasAlpha() ? SPACING + BAR_WIDTH : 0);
+        return SIZE + SPACING + BAR_WIDTH + (colorSetting.isHasAlpha() ? SPACING + BAR_WIDTH : 0);
     }
     
     public int getHeight() { return SIZE; }
     
     public int getTotalHeight() {
-        int rows = 1 + 3 + (colorSetting != null && colorSetting.hasAlpha() ? 1 : 0);
+        int rows = 1 + 3 + (colorSetting != null && colorSetting.isHasAlpha() ? 1 : 0);
         return SIZE + 10 + rows * (CONTROL_HEIGHT + CONTROL_SPACING);
     }
     
@@ -516,7 +516,7 @@ public class ColorPicker {
         int brightnessX = x + size + spacing;
         renderGradientBarCompact(context, brightnessX, y, size, barWidth, true);
         
-        if (colorSetting != null && colorSetting.hasAlpha()) {
+        if (colorSetting != null && colorSetting.isHasAlpha()) {
             int alphaX = brightnessX + barWidth + spacing;
             renderGradientBarCompact(context, alphaX, y, size, barWidth, false);
         }
@@ -604,7 +604,7 @@ public class ColorPicker {
         int brightnessY = (int) (y + (1 - hsb[2]) * size);
         drawBarIndicator(context, brightnessX, brightnessY, barWidth);
         
-        if (colorSetting.hasAlpha()) {
+        if (colorSetting.isHasAlpha()) {
             int alphaX = brightnessX + barWidth + spacing;
             int alphaY = (int) (y + (1 - colorSetting.getAlpha() / 255f) * size);
             drawBarIndicator(context, alphaX, alphaY, barWidth);

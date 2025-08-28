@@ -71,7 +71,7 @@ public final class AutoRefillModule extends Module {
             return;
         }
 
-        boolean currentKeyState = KeyUtils.isKeyPressed(refillKeybind.getKey());
+        boolean currentKeyState = KeyUtils.isKeyPressed(refillKeybind.getKeyCode());
 
         if (currentKeyState && !keyPressed) {
             handleKeyPress();
@@ -419,7 +419,7 @@ public final class AutoRefillModule extends Module {
         hoverTimer.reset();
         currentState = RefillState.IDLE;
 
-        keyPressed = KeyUtils.isKeyPressed(refillKeybind.getKey());
+        keyPressed = KeyUtils.isKeyPressed(refillKeybind.getKeyCode());
 
         updateHealthPotionsSet();
         super.onEnable();

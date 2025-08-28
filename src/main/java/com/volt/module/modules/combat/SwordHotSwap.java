@@ -34,7 +34,7 @@ public final class SwordHotSwap extends Module {
     private void onTickEvent(TickEvent event) {
         if (isNull() || mc.player == null) return;
 
-        boolean currentKeyState = KeyUtils.isKeyPressed(hotswapKey.getKey());
+        boolean currentKeyState = KeyUtils.isKeyPressed(hotswapKey.getKeyCode());
 
         if (currentKeyState && !keyPressed) {
             startSwap();

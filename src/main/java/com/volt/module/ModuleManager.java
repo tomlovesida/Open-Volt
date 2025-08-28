@@ -1,6 +1,5 @@
 package com.volt.module;
 
-
 import com.volt.module.modules.client.ClickGUIModule;
 import com.volt.module.modules.client.ClientModule;
 import com.volt.module.modules.client.PanicModule;
@@ -14,8 +13,8 @@ import com.volt.module.modules.render.*;
 import com.volt.module.modules.render.FPSCounterModule;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 public final class ModuleManager {
@@ -27,100 +26,62 @@ public final class ModuleManager {
     }
 
     public List<Module> getEnabledModules() {
-        List<Module> enabled = new ArrayList<>();
-
-        for (Module module : modules) {
-            if (module.isEnabled()) {
-                enabled.add(module);
-            }
-        }
-
-        return enabled;
+        return modules.stream()
+                .filter(Module::isEnabled)
+                .collect(Collectors.toUnmodifiableList());
     }
 
     public List<Module> getModulesInCategory(Category category) {
-        List<Module> categoryModules = new ArrayList<>();
-
-        for (Module module : modules) {
-            if (module.getModuleCategory().equals(category)) {
-                categoryModules.add(module);
-            }
-        }
-
-        return categoryModules;
+        return modules.stream()
+                .filter(module -> module.getModuleCategory() == category)
+                .collect(Collectors.toUnmodifiableList());
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Module> T getModule(Class<T> moduleClass) {
-        for (Module module : modules) {
-            if (moduleClass.isAssignableFrom(module.getClass())) {
-                return (T) module;
-            }
-        }
-
-        return null;
+    public <T extends Module> Optional<T> getModule(Class<T> moduleClass) {
+        return modules.stream()
+                .filter(module -> module.getClass().equals(moduleClass))
+                .map(moduleClass::cast)
+                .findFirst();
     }
 
-    public void addModules() {
-        //Combat
-        add(new AutoMaceModule());
-        add(new TotemHitModule());
-        add(new TriggerBotModule());
-        add(new VelocityModule());
-        add(new ShieldBreakerModule());
-        add(new ThrowPotModule());
-        add(new ElytraHotSwapModule());
-        add(new KeyCrystalModule());
-        add(new KeyAnchorModule());
-        add(new AntiMissModule());
-        add(new WTapModule());
-        add(new STapModule());
-        add(new AimAssistModule());
-        add(new SwordHotSwap());
-        //Movement
-        add(new SprintModule());
-        add(new AutoFireworkModule());
-        add(new AutoHeadHitterModule());
+    private void addModules() {
+        // Combat
+        add(
+                new AutoMaceModule(), new TotemHitModule(), new TriggerBotModule(), new VelocityModule(),
+                new ShieldBreakerModule(), new ThrowPotModule(), new ElytraHotSwapModule(), new KeyCrystalModule(),
+                new KeyAnchorModule(), new AntiMissModule(), new WTapModule(), new STapModule(),
+                new AimAssistModule(), new SwordHotSwap()
+        );
+
+        // Movement
+        add(new SprintModule(), new AutoFireworkModule(), new AutoHeadHitterModule());
+
         // Player
-        add(new AutoExtinguishModule());
-        add(new AutoToolModule());
-        add(new AutoWebModule());
-        add(new AutoRefillModule());
-        add(new AutoDrainModule());
-        add(new AutoCrafterModule());
-        add(new FastPlaceModule());
-        add(new FastExpModule());
-        add(new EagleModule());
-        add(new TrapSaveModule());
-        add(new PingSpoofModule());
-        add(new AutoDoubleHandModule());
-        add(new FastMineModule());
-        // Render
-        add(new ContainerSlots());
-        add(new FullBright());
-        add(new HUDModule());
-        add(new PlayerESPModule());
-        add(new SwingSpeedModule());
-        add(new OreESP());
-        add(new TrajectoryModule());
-        add(new FPSCounterModule());
-        // Misc
-        add(new CartKeyModule());
-        add(new HoverTotemModule());
-        add(new AutoRetotemModule());
-        add(new MiddleClickFriendModule());
-        add(new PearlKeyModule());
-        add(new WindChargeKeyModule());
-        add(new TeamsModule());
-        add(new FakePlayerModule());
+        add(
+                new AutoExtinguishModule(), new AutoToolModule(), new AutoWebModule(), new AutoRefillModule(),
+                new AutoDrainModule(), new AutoCrafterModule(), new FastPlaceModule(), new FastExpModule(),
+                new EagleModule(), new TrapSaveModule(), new PingSpoofModule(), new AutoDoubleHandModule(),
+                new FastMineModule()
+        );
 
-        //Client
-        add(new ClickGUIModule());
-        add(new ClientModule());
-        add(new PanicModule());
+        // Render
+        add(
+                new ContainerSlots(), new FullBright(), new HUDModule(), new PlayerESPModule(),
+                new SwingSpeedModule(), new OreESP(), new TrajectoryModule(), new FPSCounterModule()
+        );
+
+        // Misc
+        add(
+                new CartKeyModule(), new HoverTotemModule(), new AutoRetotemModule(),
+                new MiddleClickFriendModule(), new PearlKeyModule(), new WindChargeKeyModule(),
+                new TeamsModule(), new FakePlayerModule()
+        );
+
+        // Client
+        add(new ClickGUIModule(), new ClientModule(), new PanicModule());
     }
 
-    public void add(Module module) {
-        modules.add(module);
+    private void add(Module... mods) {
+        modules.addAll(Arrays.asList(mods));
     }
 }

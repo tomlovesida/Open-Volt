@@ -2,200 +2,185 @@ package com.volt.profiles;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.volt.Volt;
 import com.volt.module.Module;
 import com.volt.module.ModuleManager;
 import com.volt.module.setting.*;
 import com.volt.utils.mc.ChatUtils;
+import lombok.Getter;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public final class ProfileManager {
 
     private final ModuleManager moduleManager = Volt.INSTANCE.getModuleManager();
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    @Getter
     private final File profileDir = new File(Volt.mc.runDirectory, "Volt" + File.separator + "profiles");
-
 
     public ProfileManager() {
         createProfileDirectoryIfNeeded();
     }
 
     private void createProfileDirectoryIfNeeded() {
-        if (!profileDir.exists()) {
-            profileDir.mkdirs();
+        if (!profileDir.exists() && !profileDir.mkdirs()) {
+            ChatUtils.addChatMessage("§cFailed to create profile directory: " + profileDir.getAbsolutePath());
         }
     }
 
-    public void loadProfile(String profileName) {
-        File profileFile = new File(profileDir, profileName + ".json");
-
+    public void loadProfile(final String profileName) {
+        final File profileFile = new File(profileDir, profileName + ".json");
         if (!profileFile.exists()) {
             ChatUtils.addChatMessage("Profile not found: " + profileName);
             return;
         }
-
         resetProfile();
         readProfileFromFile(profileFile);
     }
 
-    private void readProfileFromFile(File profileFile) {
-        try (FileReader reader = new FileReader(profileFile)) {
-            JsonObject json = gson.fromJson(reader, JsonObject.class);
-
+    private void readProfileFromFile(final File profileFile) {
+        try (FileReader reader = new FileReader(profileFile, StandardCharsets.UTF_8)) {
+            final JsonObject json = gson.fromJson(reader, JsonObject.class);
             for (Module module : moduleManager.getModules()) {
                 if (json.has(module.getName())) {
-                    JsonObject moduleJson = json.getAsJsonObject(module.getName());
+                    final JsonObject moduleJson = json.getAsJsonObject(module.getName());
                     loadModuleSettings(module, moduleJson);
                 }
             }
-
             ChatUtils.addChatMessage("Profile loaded successfully.");
         } catch (IOException e) {
+            ChatUtils.addChatMessage("§cFailed to load profile: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void loadModuleSettings(Module module, JsonObject moduleJson) {
-        module.setEnabled(moduleJson.get("enabled").getAsBoolean());
-        module.setKey(moduleJson.get("bind").getAsInt());
-
-        module.getSettings().forEach(setting -> loadSettingValue(setting, moduleJson));
+    private void loadModuleSettings(final Module module, final JsonObject moduleJson) {
+        module.setEnabled(moduleJson.has("enabled") && moduleJson.get("enabled").getAsBoolean());
+        module.setKey(moduleJson.has("bind") ? moduleJson.get("bind").getAsInt() : 0);
+        for (Setting setting : module.getSettings()) {
+            loadSettingValue(setting, moduleJson);
+        }
     }
 
-    private void loadSettingValue(Setting setting, JsonObject moduleJson) {
-        String settingName = setting.getName();
-
-        if (!moduleJson.has(settingName)) {
-            return;
-        }
+    private void loadSettingValue(final Setting setting, final JsonObject moduleJson) {
+        final String name = setting.getName();
+        if (!moduleJson.has(name)) return;
+        final JsonElement element = moduleJson.get(name);
 
         switch (setting) {
-            case BooleanSetting booleanSetting -> booleanSetting.setValue(moduleJson.get(settingName).getAsBoolean());
-            case NumberSetting numberSetting -> numberSetting.setValue(moduleJson.get(settingName).getAsDouble());
-            case ModeSetting modeSetting -> modeSetting.setMode(moduleJson.get(settingName).getAsString());
-            case KeybindSetting keybindSetting -> keybindSetting.setKey(moduleJson.get(settingName).getAsInt());
+            case BooleanSetting booleanSetting -> booleanSetting.setValue(element.getAsBoolean());
+            case NumberSetting numberSetting -> numberSetting.setValue(element.getAsDouble());
+            case ModeSetting modeSetting -> modeSetting.setMode(element.getAsString());
+            case KeybindSetting keybindSetting -> keybindSetting.setKeyCode(element.getAsInt());
+            case StringSetting stringSetting -> stringSetting.setValue(element.getAsString());
             case ColorSetting colorSetting -> {
                 try {
-                    if (moduleJson.get(settingName).isJsonPrimitive() && moduleJson.get(settingName).getAsJsonPrimitive().isString()) {
-                        String hex = moduleJson.get(settingName).getAsString().trim();
-                        if (hex.startsWith("#")) hex = hex.substring(1);
-                        if (hex.length() == 6 || hex.length() == 8) {
+                    if (element.isJsonPrimitive()) {
+                        if (element.getAsJsonPrimitive().isString()) {
+                            String hex = element.getAsString().trim();
+                            if (hex.startsWith("#")) hex = hex.substring(1);
                             int r = Integer.parseInt(hex.substring(0, 2), 16);
                             int g = Integer.parseInt(hex.substring(2, 4), 16);
                             int b = Integer.parseInt(hex.substring(4, 6), 16);
-                            if (colorSetting.hasAlpha() && hex.length() == 8) {
+                            if (colorSetting.isHasAlpha() && hex.length() == 8) {
                                 int a = Integer.parseInt(hex.substring(6, 8), 16);
                                 colorSetting.setValue(r, g, b, a);
                             } else {
                                 colorSetting.setValue(r, g, b);
                             }
+                        } else if (element.getAsJsonPrimitive().isNumber()) {
+                            int argb = element.getAsInt();
+                            int a = (argb >> 24) & 0xFF;
+                            int r = (argb >> 16) & 0xFF;
+                            int g = (argb >> 8) & 0xFF;
+                            int b = argb & 0xFF;
+                            if (colorSetting.isHasAlpha()) colorSetting.setValue(r, g, b, a);
+                            else colorSetting.setValue(r, g, b);
                         }
-                    } else if (moduleJson.get(settingName).isJsonPrimitive() && moduleJson.get(settingName).getAsJsonPrimitive().isNumber()) {
-                        int argb = moduleJson.get(settingName).getAsInt();
-                        int a = (argb >> 24) & 0xFF;
-                        int r = (argb >> 16) & 0xFF;
-                        int g = (argb >> 8) & 0xFF;
-                        int b = argb & 0xFF;
-                        if (colorSetting.hasAlpha()) colorSetting.setValue(r, g, b, a); else colorSetting.setValue(r, g, b);
                     }
-                } catch (Exception ignored) {
+                } catch (Exception ex) {
+                    ChatUtils.addChatMessage("§cFailed to load color for setting: " + name);
                 }
             }
-            default -> {
-            }
+            default -> ChatUtils.addChatMessage("§cUnknown setting type: " + setting.getClass().getSimpleName());
         }
     }
 
-    public void saveProfile(String profileName) {
+    public void saveProfile(final String profileName) {
         saveProfile(profileName, false);
     }
-    
-    public void saveProfile(String profileName, boolean forceOverride) {
-        File profileFile = new File(profileDir, profileName + ".json");
-        
+
+    public void saveProfile(final String profileName, final boolean forceOverride) {
+        final File profileFile = new File(profileDir, profileName + ".json");
         if (profileFile.exists() && !forceOverride) {
             ChatUtils.addChatMessage("§eProfile '" + profileName + "' already exists. Use .save <name> -override to overwrite it.");
             return;
         }
 
         try {
-            if (profileFile.exists()) profileFile.delete();
-            profileFile.createNewFile();
-            if (forceOverride) {
-                ChatUtils.addChatMessage("§aProfile '" + profileName + "' overridden successfully.");
-            } else {
-                ChatUtils.addChatMessage("§aProfile '" + profileName + "' saved successfully.");
-            }
+            if (!profileFile.exists()) profileFile.createNewFile();
+            ChatUtils.addChatMessage(forceOverride ?
+                    "§aProfile '" + profileName + "' overridden successfully." :
+                    "§aProfile '" + profileName + "' saved successfully.");
         } catch (IOException e) {
-            e.printStackTrace();
             ChatUtils.addChatMessage("§cFailed to save profile: " + e.getMessage());
+            e.printStackTrace();
             return;
         }
-
         writeProfileToFile(profileFile);
     }
 
-    private void writeProfileToFile(File profileFile) {
-        JsonObject json = new JsonObject();
-
-        moduleManager.getModules().forEach(module -> {
-            JsonObject moduleJson = new JsonObject();
+    private void writeProfileToFile(final File profileFile) {
+        final JsonObject json = new JsonObject();
+        for (Module module : moduleManager.getModules()) {
+            final JsonObject moduleJson = new JsonObject();
             moduleJson.addProperty("enabled", module.isEnabled());
             moduleJson.addProperty("bind", module.getKey());
-
-            module.getSettings().forEach(setting -> saveSettingValue(setting, moduleJson));
+            for (Setting setting : module.getSettings()) saveSettingValue(setting, moduleJson);
             json.add(module.getName(), moduleJson);
-        });
-
-        try (FileWriter writer = new FileWriter(profileFile)) {
+        }
+        try (FileWriter writer = new FileWriter(profileFile, StandardCharsets.UTF_8)) {
             gson.toJson(json, writer);
         } catch (IOException e) {
+            ChatUtils.addChatMessage("§cFailed to write profile: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void saveSettingValue(Setting setting, JsonObject moduleJson) {
-        String settingName = setting.getName();
+    private void saveSettingValue(final Setting setting, final JsonObject moduleJson) {
+        final String name = setting.getName();
         switch (setting) {
-            case BooleanSetting booleanSetting -> moduleJson.addProperty(settingName, booleanSetting.getValue());
-            case NumberSetting numberSetting -> moduleJson.addProperty(settingName, numberSetting.getValue());
-            case ModeSetting modeSetting -> moduleJson.addProperty(settingName, modeSetting.getMode());
-            case KeybindSetting keybindSetting -> moduleJson.addProperty(settingName, keybindSetting.getKey());
+            case BooleanSetting booleanSetting -> moduleJson.addProperty(name, booleanSetting.getValue());
+            case NumberSetting numberSetting -> moduleJson.addProperty(name, numberSetting.getValue());
+            case ModeSetting modeSetting -> moduleJson.addProperty(name, modeSetting.getMode());
+            case KeybindSetting keybindSetting -> moduleJson.addProperty(name, keybindSetting.getKeyCode());
+            case StringSetting stringSetting -> moduleJson.addProperty(name, stringSetting.getValue());
             case ColorSetting colorSetting -> {
                 String hex = String.format("#%02X%02X%02X", colorSetting.getRed(), colorSetting.getGreen(), colorSetting.getBlue());
-                if (colorSetting.hasAlpha()) {
-                    hex += String.format("%02X", colorSetting.getAlpha());
-                }
-                moduleJson.addProperty(settingName, hex);
+                if (colorSetting.isHasAlpha()) hex += String.format("%02X", colorSetting.getAlpha());
+                moduleJson.addProperty(name, hex);
             }
-            default -> {
-            }
+            default -> ChatUtils.addChatMessage("§cUnknown setting type: " + setting.getClass().getSimpleName());
         }
     }
 
     public void resetProfile() {
-        moduleManager.getModules().forEach(module -> {
+        for (Module module : moduleManager.getModules()) {
             module.setEnabled(false);
             module.setKey(0);
-
-            module.getSettings().forEach(this::resetSettingValue);
-        });
+            for (Setting setting : module.getSettings()) resetSettingValue(setting);
+        }
     }
 
-    private void resetSettingValue(Setting setting) {
-        if (setting instanceof BooleanSetting) {
-            ((BooleanSetting) setting).setValue(false);
-        } else if (setting instanceof NumberSetting) {
-            ((NumberSetting) setting).setValue(((NumberSetting) setting).getMin());
-        } else if (setting instanceof ModeSetting) {
-            ((ModeSetting) setting).setMode(((ModeSetting) setting).getModes().getFirst());
-        } else if (setting instanceof KeybindSetting) {
-            ((KeybindSetting) setting).setKey(((KeybindSetting) setting).getKey());
-        }
+    private void resetSettingValue(final Setting setting) {
+        if (setting instanceof BooleanSetting booleanSetting) booleanSetting.setValue(false);
+        else if (setting instanceof NumberSetting numberSetting) numberSetting.setValue(numberSetting.getMin());
+        else if (setting instanceof ModeSetting modeSetting) modeSetting.setMode(modeSetting.getModes().getFirst());
     }
 }

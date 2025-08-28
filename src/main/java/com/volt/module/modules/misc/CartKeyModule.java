@@ -42,7 +42,7 @@ public final class CartKeyModule extends Module {
     private void onTickEvent(TickEvent event) {
         if (isNull() || mc.currentScreen != null) return;
 
-        boolean keyDown = KeyUtils.isKeyPressed(key.getKey());
+        boolean keyDown = KeyUtils.isKeyPressed(key.getKeyCode());
         boolean rightClick = mc.options.useKey.isPressed();
         long now = System.currentTimeMillis();
 

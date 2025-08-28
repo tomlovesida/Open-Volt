@@ -20,7 +20,8 @@ public class ScreenMixin {
 
     @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
     private void dontRenderBackground(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (this.client.currentScreen instanceof ClickGui) {
+        if (client == null) return;
+        if (client.currentScreen instanceof ClickGui) {
             ci.cancel();
         }
     }

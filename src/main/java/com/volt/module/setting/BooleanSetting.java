@@ -1,5 +1,8 @@
 package com.volt.module.setting;
 
+import lombok.Setter;
+
+@Setter
 public class BooleanSetting extends Setting {
     private boolean value;
 
@@ -9,14 +12,10 @@ public class BooleanSetting extends Setting {
     }
 
     public void toggle() {
-        setValue(!value);
+        this.value = !this.value;
     }
 
     public boolean getValue() {
         return value;
-    }
-
-    public void setValue(boolean value) {
-        this.value = value;
     }
 }

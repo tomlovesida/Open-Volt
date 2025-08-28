@@ -42,13 +42,13 @@ public class GuiEventHandler {
         if (listeningKeybind != null) {
             wasListeningKeybind = true;
             if (button == 0) {
-                listeningKeybind.setKey(GLFW.GLFW_MOUSE_BUTTON_LEFT);
+                listeningKeybind.setKeyCode(GLFW.GLFW_MOUSE_BUTTON_LEFT);
             } else if (button == 1) {
-                listeningKeybind.setKey(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+                listeningKeybind.setKeyCode(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
             } else if (button == 2) {
-                listeningKeybind.setKey(GLFW.GLFW_MOUSE_BUTTON_MIDDLE);
+                listeningKeybind.setKeyCode(GLFW.GLFW_MOUSE_BUTTON_MIDDLE);
             } else {
-                listeningKeybind.setKey(button);
+                listeningKeybind.setKeyCode(button);
             }
             listeningKeybind.setListening(false);
             listeningKeybind = null;
@@ -318,9 +318,9 @@ public class GuiEventHandler {
         if (listeningKeybind != null) {
             wasListeningKeybind = true;
             if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-                listeningKeybind.setKey(GLFW.GLFW_KEY_UNKNOWN);
+                listeningKeybind.setKeyCode(GLFW.GLFW_KEY_UNKNOWN);
             } else {
-                listeningKeybind.setKey(keyCode);
+                listeningKeybind.setKeyCode(keyCode);
             }
             listeningKeybind.setListening(false);
             listeningKeybind = null;

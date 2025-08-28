@@ -1,5 +1,6 @@
 package com.volt.module.modules.misc;
 
+import com.volt.Volt;
 import com.volt.module.Category;
 import com.volt.module.Module;
 import net.minecraft.client.MinecraftClient;
@@ -14,7 +15,7 @@ public class TeamsModule extends Module {
     }
     
     public static boolean isTeammate(Entity entity) {
-        TeamsModule teamsModule = com.volt.Volt.INSTANCE.getModuleManager().getModule(TeamsModule.class);
+        TeamsModule teamsModule = Volt.INSTANCE.getModuleManager().getModule(TeamsModule.class).get();
         if (teamsModule == null || !teamsModule.isEnabled()) {
             return false;
         }

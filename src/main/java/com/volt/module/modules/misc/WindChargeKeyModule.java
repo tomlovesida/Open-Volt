@@ -40,7 +40,7 @@ public final class WindChargeKeyModule extends Module {
     private void onTickEvent(TickEvent event) {
         if (isNull()) return;
         if (mc.currentScreen != null) return;
-        boolean currentKeyState = KeyUtils.isKeyPressed(windChargeKeybind.getKey());
+        boolean currentKeyState = KeyUtils.isKeyPressed(windChargeKeybind.getKeyCode());
 
         if (currentKeyState && !keyPressed) {
             handleWindChargeThrow();

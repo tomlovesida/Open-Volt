@@ -27,7 +27,7 @@ public class KeyboardMixin {
                 for (Module module : Volt.INSTANCE.moduleManager.getModules()) {
                     if (key == module.getKey() && action == GLFW.GLFW_PRESS) {
                         if (KeyUtils.isKeyPressed(key)) {
-                        module.toggle();
+                            module.toggle();
                         }
                     }
                 }

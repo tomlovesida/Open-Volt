@@ -91,7 +91,6 @@ public final class KeyUtils implements IMinecraft {
         };
     }
 
-
     public static boolean isKeyPressed(int keyCode) {
         if (keyCode <= 8)
             return GLFW.glfwGetMouseButton(mc.getWindow().getHandle(), keyCode) == GLFW.GLFW_PRESS;

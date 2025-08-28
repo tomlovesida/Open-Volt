@@ -17,49 +17,62 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Objects;
-
 @Mixin(MinecraftClient.class)
 public class MinecraftClientMixin implements IMinecraft {
 
     @Shadow
     public ClientWorld world;
 
-    // The null ptr is real...
     @Inject(method = "getWindowTitle", at = @At("HEAD"), cancellable = true)
     public void setTitle(CallbackInfoReturnable<String> cir) {
-        if (Volt.INSTANCE != null && ClientModule.title.getValue() && Objects.requireNonNull(Volt.INSTANCE.getModuleManager().getModule(ClientModule.class)).isEnabled() && Volt.mc != null) {
-            cir.setReturnValue("Volt 1.21");
+        if (Volt.INSTANCE == null || Volt.mc == null) return;
+
+        var optionalClientModule = Volt.INSTANCE.getModuleManager().getModule(ClientModule.class);
+        if (optionalClientModule.isPresent()) {
+            ClientModule clientModule = optionalClientModule.get();
+            if (clientModule.isEnabled() && clientModule.getTitle()) {
+                cir.setReturnValue("Volt 1.21");
+            }
         }
     }
 
     @Inject(method = "run", at = @At("HEAD"))
     public void runInject(CallbackInfo ci) {
-        ProfileManager profileManager = new ProfileManager();
-        profileManager.loadProfile("default");
+        if (Volt.INSTANCE != null) {
+            ProfileManager profileManager = Volt.INSTANCE.getProfileManager();
+            profileManager.loadProfile("default");
+        }
     }
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTick(CallbackInfo ci) {
+        if (Volt.INSTANCE == null || Volt.mc == null) return;
+
         if (world != null) {
             Volt.INSTANCE.getVoltEventBus().post(new TickEvent());
         }
-        if (Volt.INSTANCE.getModuleManager().getModule(ClickGUIModule.class).isEnabled() && !(mc.currentScreen instanceof ClickGui) && world != null) {
-            mc.setScreen(new ClickGui());
+
+        var optionalClickGuiModule = Volt.INSTANCE.getModuleManager().getModule(ClickGUIModule.class);
+        if (optionalClickGuiModule.isPresent()) {
+            ClickGUIModule clickGuiModule = optionalClickGuiModule.get();
+            if (clickGuiModule.isEnabled() && !(Volt.mc.currentScreen instanceof ClickGui) && world != null) {
+                Volt.mc.setScreen(new ClickGui());
+            }
         }
     }
 
     @Inject(method = "stop", at = @At("HEAD"))
     public void stopInject(CallbackInfo ci) {
-        ProfileManager profileManager = new ProfileManager();
-        profileManager.saveProfile("default");
+        if (Volt.INSTANCE != null) {
+            ProfileManager profileManager = Volt.INSTANCE.getProfileManager();
+            profileManager.saveProfile("default");
+        }
     }
 
-    @Inject(
-            method = "setWorld",
-            at = @At("HEAD")
-    )
-    public void onWorldChangeInject(ClientWorld world, CallbackInfo ci) {
-        Volt.INSTANCE.getVoltEventBus().post(new WorldChangeEvent(mc.world));
+    @Inject(method = "setWorld", at = @At("HEAD"))
+    public void onWorldChangeInject(ClientWorld newWorld, CallbackInfo ci) {
+        if (Volt.INSTANCE != null && Volt.mc != null) {
+            Volt.INSTANCE.getVoltEventBus().post(new WorldChangeEvent(newWorld));
+        }
     }
 }

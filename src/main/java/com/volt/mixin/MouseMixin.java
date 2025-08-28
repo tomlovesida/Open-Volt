@@ -13,17 +13,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Mouse.class)
 public class MouseMixin {
+
     @Shadow
     @Final
     private MinecraftClient client;
 
     @Inject(method = "onMouseButton", at = @At("HEAD"))
     private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
-        if (window == this.client.getWindow().getHandle()) {
-            if (this.client.currentScreen == null) {
-                MouseClickEvent event = new MouseClickEvent(button, action, mods);
-                Volt.INSTANCE.getVoltEventBus().post(event);
-            }
-        }
+        if (Volt.INSTANCE == null || Volt.INSTANCE.getVoltEventBus() == null) return;
+        if (window != client.getWindow().getHandle()) return;
+        if (client.currentScreen != null) return;
+
+        MouseClickEvent event = new MouseClickEvent(button, action, mods);
+        Volt.INSTANCE.getVoltEventBus().post(event);
     }
 }

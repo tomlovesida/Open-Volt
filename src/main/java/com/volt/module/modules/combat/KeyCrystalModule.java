@@ -44,7 +44,7 @@ public final class KeyCrystalModule extends Module {
     private void onTickEvent(TickEvent event) {
         if (isNull()) return;
         if (mc.currentScreen != null) return;
-        boolean currentKeyState = KeyUtils.isKeyPressed(crystalKeybind.getKey());
+        boolean currentKeyState = KeyUtils.isKeyPressed(crystalKeybind.getKeyCode());
 
         if (currentKeyState && !keyPressed) {
             startCrystalPvP();

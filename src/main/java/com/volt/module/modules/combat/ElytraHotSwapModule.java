@@ -42,7 +42,7 @@ public final class ElytraHotSwapModule extends Module {
     private void onTickEvent(TickEvent event) {
         if (isNull()) return;
 
-        boolean currentKeyState = KeyUtils.isKeyPressed(hotswapKey.getKey());
+        boolean currentKeyState = KeyUtils.isKeyPressed(hotswapKey.getKeyCode());
 
         if (currentKeyState && !keyPressed) {
             startHotswap();

@@ -87,7 +87,7 @@ public final class ClickGui extends Screen {
             lastScrollOffset = eventHandler.getScrollOffset();
             lastModuleExpanded.clear();
             lastModuleExpanded.putAll(moduleExpanded);
-            Volt.INSTANCE.getModuleManager().getModule(ClickGUIModule.class).setEnabled(false);
+            Volt.INSTANCE.getModuleManager().getModule(ClickGUIModule.class).get().setEnabled(false);
             super.close();
             return;
         }
@@ -208,7 +208,7 @@ public final class ClickGui extends Screen {
             float newAnimation = MathHelper.lerp(0.15f, currentAnimation, targetAnimation);
             animationManager.setCategoryAnimation(category, newAnimation);
             Color textColor = isSelected ? Color.WHITE : new Color(180, 180, 180);
-            regularFont.drawString(matrices, category.name, sidebarX + 20, categoryY + 13, textColor);
+            regularFont.drawString(matrices, category.getName(), sidebarX + 20, categoryY + 13, textColor);
             
             categoryY += 45;
         }
@@ -301,7 +301,6 @@ public final class ClickGui extends Screen {
                 int settingsHeight = renderModuleSettings(context, module, x, moduleY, width, newDropdown);
                 moduleY += (int)(newDropdown * settingsHeight);
             }
-            
         }
       
         context.disableScissor();
@@ -314,10 +313,6 @@ public final class ClickGui extends Screen {
     private int renderModuleSettings(DrawContext context, Module module, int x, int moduleY, int width, float animation) {
         return SettingsRenderer.renderModuleSettings(context, module, x, moduleY, width, animation, smallFont, eventHandler.getDropdownExpanded(), eventHandler);
     }
-    
-
-    
-    
     
     private boolean handleColorPickerClicks(double mouseX, double mouseY, int button) {
         return colorPickerManager.handleColorPickerClicks(mouseX, mouseY, button);

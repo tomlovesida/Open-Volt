@@ -40,6 +40,6 @@ public final class Volt implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        new Volt();
+        // Double initialization prevention, it's already initializing in the constructor
     }
 }

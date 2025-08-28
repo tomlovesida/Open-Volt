@@ -1,40 +1,27 @@
 package com.volt.module.setting;
 
-@SuppressWarnings("all")
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class NumberSetting extends Setting {
-    private double min, max, value, increment;
+    private final double min;
+    private final double max;
+    private final double increment;
+    private double value;
 
     public NumberSetting(String name, double min, double max, double value, double increment) {
         super(name);
         this.min = min;
         this.max = max;
-        this.value = value;
         this.increment = increment;
-    }
-
-    public double getMin() {
-        return min;
-    }
-
-    public void setMin(double min) {
-        this.min = min;
-    }
-
-    public double getMax() {
-        return max;
-    }
-
-    public void setMax(double max) {
-        this.max = max;
-    }
-
-    public double getValue() {
-        return value;
+        setValue(value);
     }
 
     public void setValue(double value) {
-        double precision = 1.0D / this.increment;
-        this.value = Math.round(Math.max(this.min, Math.min(this.max, value)) * precision) / precision;
+        double precision = 1.0D / increment;
+        this.value = Math.round(Math.max(min, Math.min(max, value)) * precision) / precision;
     }
 
     public int getValueInt() {
@@ -43,13 +30,5 @@ public class NumberSetting extends Setting {
 
     public float getValueFloat() {
         return (float) value;
-    }
-
-    public double getIncrement() {
-        return increment;
-    }
-
-    public void setIncrement(double increment) {
-        this.increment = increment;
     }
 }
