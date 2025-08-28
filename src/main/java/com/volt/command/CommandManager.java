@@ -12,72 +12,62 @@ import java.util.Arrays;
 public class CommandManager {
     private static final String PREFIX = ".";
     private final ProfileManager profileManager;
-    
+
     public CommandManager() {
-        this.profileManager = new ProfileManager();
+        this.profileManager = Volt.INSTANCE.getProfileManager();
         Volt.INSTANCE.getVoltEventBus().subscribe(this);
     }
-    
+
     @EventHandler
-    public void onChat(ChatEvent event) {
-        String message = event.getMessage();
-        
-        if (!message.startsWith(PREFIX)) {
-            return;
-        }
-        
+    public void onChat(final ChatEvent event) {
+        final String message = event.getMessage();
+        if (!message.startsWith(PREFIX)) return;
+
         event.setCancelled(true);
-        
-        String[] args = message.substring(PREFIX.length()).split(" ");
-        String command = args[0].toLowerCase();
-        
+        final String[] args = message.substring(PREFIX.length()).split(" ");
+        final String command = args[0].toLowerCase();
+
         switch (command) {
             case "save", "saveconfig" -> handleSaveCommand(args);
             case "load", "loadconfig" -> handleLoadCommand(args);
             case "profiles", "listprofiles" -> handleListProfilesCommand(args);
             case "deleteprofile" -> handleDeleteProfileCommand(args);
             case "help", "commands" -> handleHelpCommand();
-            default -> ChatUtils.addChatMessage("§cUnknown command: " + command + ". Type .help for available commands.");
+            default ->
+                    ChatUtils.addChatMessage("§cUnknown command: " + command + ". Type .help for available commands.");
         }
     }
-    
-    private void handleSaveCommand(String[] args) {
+
+    private void handleSaveCommand(final String[] args) {
         if (args.length < 2) {
             ChatUtils.addChatMessage("§cUsage: .save <profile_name> [-override]");
             return;
         }
-        
-        boolean forceOverride = false;
-        String[] nameArgs = args;
-        
-        if (args.length > 2 && args[args.length - 1].equalsIgnoreCase("-override")) {
-            forceOverride = true;
-            nameArgs = Arrays.copyOfRange(args, 1, args.length - 1);
-        } else {
-            nameArgs = Arrays.copyOfRange(args, 1, args.length);
-        }
-        
-        String profileName = String.join(" ", nameArgs);
+
+        boolean forceOverride = args[args.length - 1].equalsIgnoreCase("-override");
+        final int endIndex = forceOverride ? args.length - 1 : args.length;
+        final String profileName = String.join(" ", Arrays.copyOfRange(args, 1, endIndex));
+
         profileManager.saveProfile(profileName, forceOverride);
     }
-    
-    private void handleLoadCommand(String[] args) {
+
+    private void handleLoadCommand(final String[] args) {
         if (args.length < 2) {
             ChatUtils.addChatMessage("§cUsage: .load <profile_name>");
             return;
         }
-        
-        String profileName = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+        final String profileName = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
         profileManager.loadProfile(profileName);
     }
 
-    private void handleListProfilesCommand(String[] args) {
-        File profileDir = new File(Volt.mc.runDirectory, "Volt" + File.separator + "profiles");
+    private void handleListProfilesCommand(final String[] args) {
+        final File profileDir = profileManager.getProfileDir();
 
         if (!profileDir.exists() || !profileDir.isDirectory()) {
             ChatUtils.addChatMessage("§cNo profiles directory found.");
             return;
         }
+
         if (args.length > 1 && args[1].equalsIgnoreCase("folder")) {
             try {
                 java.awt.Desktop.getDesktop().open(profileDir);
@@ -89,8 +79,7 @@ public class CommandManager {
             return;
         }
 
-        File[] profiles = profileDir.listFiles((dir, name) -> name.endsWith(".json"));
-
+        final File[] profiles = profileDir.listFiles((dir, name) -> name.endsWith(".json"));
         if (profiles == null || profiles.length == 0) {
             ChatUtils.addChatMessage("§eNo profiles found.");
             return;
@@ -98,27 +87,24 @@ public class CommandManager {
 
         ChatUtils.addChatMessage("§bAvailable profiles:");
         for (File profile : profiles) {
-            String name = profile.getName().replace(".json", "");
-            ChatUtils.addChatMessage("§7- " + name);
+            ChatUtils.addChatMessage("§7- " + profile.getName().replace(".json", ""));
         }
     }
 
-    
-    private void handleDeleteProfileCommand(String[] args) {
+    private void handleDeleteProfileCommand(final String[] args) {
         if (args.length < 2) {
             ChatUtils.addChatMessage("§cUsage: .deleteprofile <profile_name>");
             return;
         }
-        
-        String profileName = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-        File profileDir = new File(Volt.mc.runDirectory, "Volt" + File.separator + "profiles");
-        File profileFile = new File(profileDir, profileName + ".json");
-        
+
+        final String profileName = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+        final File profileFile = new File(profileManager.getProfileDir(), profileName + ".json");
+
         if (!profileFile.exists()) {
             ChatUtils.addChatMessage("§cProfile '" + profileName + "' not found.");
             return;
         }
-        
+
         if (profileFile.delete()) {
             ChatUtils.addChatMessage("§aProfile '" + profileName + "' deleted successfully!");
         } else {

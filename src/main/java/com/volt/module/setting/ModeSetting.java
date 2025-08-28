@@ -1,17 +1,19 @@
 package com.volt.module.setting;
 
+import lombok.Getter;
+
 import java.util.Arrays;
 import java.util.List;
 
-@SuppressWarnings("all")
 public class ModeSetting extends Setting {
-    private final String mode;
+    private final String defaultMode;
+    @Getter
     private final List<String> modes;
-    public int index;
+    private int index;
 
     public ModeSetting(String name, String defaultMode, String... modes) {
         super(name);
-        this.mode = defaultMode;
+        this.defaultMode = defaultMode;
         this.modes = Arrays.asList(modes);
         this.index = this.modes.indexOf(defaultMode);
         if (this.index == -1) {
@@ -34,18 +36,10 @@ public class ModeSetting extends Setting {
     }
 
     public void cycle() {
-        if (index < modes.size() - 1) {
-            index++;
-        } else {
-            index = 0;
-        }
+        index = (index + 1) % modes.size();
     }
 
     public boolean isMode(String mode) {
-        return index == modes.indexOf(mode);
-    }
-
-    public List<String> getModes() {
-        return modes;
+        return mode.equals(getMode());
     }
 }

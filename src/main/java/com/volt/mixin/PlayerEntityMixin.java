@@ -10,21 +10,25 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Objects;
+import java.util.Optional;
 
 @Mixin(PlayerEntity.class)
 public class PlayerEntityMixin {
+
     @Inject(method = "getBlockBreakingSpeed", at = @At("RETURN"), cancellable = true)
     private void modifyBlockBreakingSpeed(BlockState block, CallbackInfoReturnable<Float> cir) {
-        if (!(Objects.requireNonNull(Volt.INSTANCE.getModuleManager().getModule(FastMineModule.class)).isEnabled())) {
-            return;
-        }
+        if (Volt.INSTANCE == null) return;
+
+        Optional<FastMineModule> optionalModule = Volt.INSTANCE.getModuleManager().getModule(FastMineModule.class);
+        if (optionalModule.isEmpty()) return;
+
+        FastMineModule fastMine = optionalModule.get();
+        if (!fastMine.isEnabled()) return;
 
         PlayerEntity player = (PlayerEntity) (Object) this;
-        if (player == MinecraftClient.getInstance().player) {
-                float modifiedSpeed = (cir.getReturnValue() * Objects.requireNonNull(Volt.INSTANCE.getModuleManager().getModule(FastMineModule.class)).getSpeed());
-                cir.setReturnValue(modifiedSpeed);
+        if (player != MinecraftClient.getInstance().player) return;
 
-        }
+        float modifiedSpeed = cir.getReturnValue() * fastMine.getSpeed();
+        cir.setReturnValue(modifiedSpeed);
     }
 }

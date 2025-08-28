@@ -43,7 +43,7 @@ public final class KeyAnchorModule extends Module {
     private void onTickEvent(TickEvent event) {
         if (isNull() || !isEnabled()) return;
         if (mc.currentScreen != null) return;
-        boolean currentKeyState = KeyUtils.isKeyPressed(anchorKeybind.getKey());
+        boolean currentKeyState = KeyUtils.isKeyPressed(anchorKeybind.getKeyCode());
 
         if (currentKeyState && !keyPressed) {
             startAnchorPvP();

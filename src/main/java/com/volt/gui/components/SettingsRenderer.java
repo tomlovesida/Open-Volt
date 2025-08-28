@@ -200,7 +200,7 @@ public class SettingsRenderer {
             }
             
             case KeybindSetting keybindSetting -> {
-                String keyText = keybindSetting.isListening() ? "..." : com.volt.utils.keybinding.KeyUtils.getKey(keybindSetting.getKey());
+                String keyText = keybindSetting.isListening() ? "..." : com.volt.utils.keybinding.KeyUtils.getKey(keybindSetting.getKeyCode());
                 Color bgColor = keybindSetting.isListening() ? new Color(100, 150, 255, 100) : new Color(40, 40, 50);
                 
                 context.fill(controlX, controlY, controlX + controlWidth, controlY + controlHeight, bgColor.getRGB());
@@ -218,7 +218,7 @@ public class SettingsRenderer {
                 int previewX = controlX + controlWidth - previewSize - 2;
                 int previewY = controlY + (controlHeight - previewSize) / 2;
                 
-                if (colorSetting.hasAlpha()) {
+                if (colorSetting.isHasAlpha()) {
                     renderCheckerboard(context, previewX, previewY, previewSize, previewSize);
                 }
                 

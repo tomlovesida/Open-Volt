@@ -43,7 +43,7 @@ public final class AutoWebModule extends Module {
         if (mc.player == null || mc.world == null)
             return;
 
-        boolean currentKeyState = KeyUtils.isKeyPressed(webKeybind.getKey());
+        boolean currentKeyState = KeyUtils.isKeyPressed(webKeybind.getKeyCode());
 
         if (currentKeyState && !keyPressed) {
             startPlacing();

@@ -11,4 +11,8 @@ public final class ClientModule extends Module {
         super("Client", "Settings for the client", -1, Category.CLIENT);
         this.addSettings(title);
     }
+
+    public boolean getTitle() {
+        return title.getValue();
+    }
 }

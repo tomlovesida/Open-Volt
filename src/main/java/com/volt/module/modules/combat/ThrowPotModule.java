@@ -72,7 +72,7 @@ public final class ThrowPotModule extends Module {
             return;
         }
 
-        boolean currentKeyState = KeyUtils.isKeyPressed(throwKey.getKey());
+        boolean currentKeyState = KeyUtils.isKeyPressed(throwKey.getKeyCode());
 
         if (currentKeyState && !keyPressed && !isThrowing && !isRotating && !isRotatingBack && !isMultiThrowing) {
             if (timer.hasElapsedTime(throwDelay.getValueInt()) && isHealthBelowThreshold()) {

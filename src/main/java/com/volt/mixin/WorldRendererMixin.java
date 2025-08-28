@@ -15,16 +15,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(WorldRenderer.class)
 public class WorldRendererMixin {
-    @Inject(
-            method = "renderChunkDebugInfo",
-            at = @At("HEAD")
-    )
+
+    @Inject(method = "renderChunkDebugInfo", at = @At("HEAD"))
     public void renderChunkDebugInfoInject(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Camera camera, CallbackInfo ci) {
+        if (Volt.INSTANCE == null || Volt.INSTANCE.getVoltEventBus() == null) return;
+
         RendererUtils.lastProjMat.set(RenderSystem.getProjectionMatrix());
         RendererUtils.lastModMat.set(RenderSystem.getModelViewMatrix());
         RendererUtils.lastWorldSpaceMatrix.identity();
+
         Volt.INSTANCE.getVoltEventBus().post(new EventRender3D(matrices));
     }
-
-
 }

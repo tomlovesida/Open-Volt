@@ -1,6 +1,11 @@
 package com.volt.module.setting;
 
+import lombok.*;
+
+@Getter
+@Setter
 public final class KeybindSetting extends Setting {
+
     private final boolean moduleKey;
     private final int originalKey;
     private int keyCode;
@@ -11,30 +16,6 @@ public final class KeybindSetting extends Setting {
         this.keyCode = key;
         this.originalKey = key;
         this.moduleKey = moduleKey;
-    }
-
-    public boolean isModuleKey() {
-        return moduleKey;
-    }
-
-    public boolean isListening() {
-        return listening;
-    }
-
-    public void setListening(boolean listening) {
-        this.listening = listening;
-    }
-
-    public int getOriginalKey() {
-        return originalKey;
-    }
-
-    public int getKey() {
-        return keyCode;
-    }
-
-    public void setKey(int key) {
-        this.keyCode = key;
     }
 
     public void toggleListening() {
