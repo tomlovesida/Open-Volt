@@ -21,7 +21,7 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-
+import org.lwjgl.glfw.GLFW;
 
 
 public class AimAssist extends Module {
@@ -39,6 +39,7 @@ public class AimAssist extends Module {
     private final BooleanSetting weaponsOnly = new BooleanSetting("Weapons Only", false);
     private final BooleanSetting throughWalls = new BooleanSetting("Through Walls", false);
     private final BooleanSetting disableOnTarget  = new BooleanSetting("Disable on target", false);
+    private final BooleanSetting workOnlyWhileRMBPressed = new BooleanSetting("Work only when RMB is pressed", false);
 
     private Entity currentTarget = null;
     private long lastUpdateTime = 0;
@@ -46,7 +47,7 @@ public class AimAssist extends Module {
 
     public AimAssist() {
         super("Aim Assist", "Helps you with aiming", Category.COMBAT);
-        addSettings(mode, speed, fov, range, pitchSpeed, yawSpeed, smoothing,steepNess,noiseSpeed, targetPlayers, targetMobs, weaponsOnly, throughWalls, disableOnTarget);
+        addSettings(mode, speed, fov, range, pitchSpeed, yawSpeed, smoothing,steepNess,noiseSpeed, targetPlayers, targetMobs, weaponsOnly, throughWalls, disableOnTarget, workOnlyWhileRMBPressed);
     }
     
     @EventHandler
@@ -57,12 +58,13 @@ public class AimAssist extends Module {
         if (mc.currentScreen != null) return;
         HitResult hit = mc.crosshairTarget;
 
-        if (disableOnTarget.getValue() && hit != null && hit.getType() == HitResult.Type.ENTITY) {
-            EntityHitResult entityHit = (EntityHitResult) hit;
-            if (entityHit.getEntity() == currentTarget) {
+        if (disableOnTarget.getValue() && hit instanceof EntityHitResult entityHit) {
+            Entity entity = entityHit.getEntity();
+            if (isValidTarget(entity) && entity != currentTarget) {
                 return;
             }
         }
+        if (workOnlyWhileRMBPressed.getValue() && GLFW.glfwGetMouseButton(mc.getWindow().getHandle(),  GLFW.GLFW_MOUSE_BUTTON_2) != GLFW.GLFW_PRESS) return;
 
         currentTarget = findBestTarget();
         
