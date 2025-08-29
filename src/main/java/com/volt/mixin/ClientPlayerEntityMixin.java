@@ -2,7 +2,7 @@ package com.volt.mixin;
 
 import com.mojang.authlib.GameProfile;
 import com.volt.Volt;
-import com.volt.event.impl.player.PreMotion;
+import com.volt.event.impl.player.PreMotionEvent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -64,7 +64,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
      */
     @Overwrite
     private void sendMovementPackets() {
-        PreMotion event = new PreMotion(
+        PreMotionEvent event = new PreMotionEvent(
                 this.getX(),
                 this.getBoundingBox().minY,
                 this.getZ(),
