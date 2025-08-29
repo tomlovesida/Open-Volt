@@ -26,6 +26,7 @@ public class HUD extends Module {
     public static final ModeSetting watermarkMode = new ModeSetting("Watermark Mode", "Simple", "Simple", "Gamesense");
     public static final StringSetting watermarkText = new StringSetting("Watermark Text", "Volt");
     public static final ModeSetting watermarkSimpleFontMode = new ModeSetting("Watermark Font", "MC", "MC", "Inter", "JetbrainsMono", "Poppins");
+    public static final NumberSetting watermarkScale = new NumberSetting("Watermark Scale", 0.5, 3.0, 1.0, 0.1);
     public static final BooleanSetting arrayList = new BooleanSetting("ArrayList", true);
     public static final NumberSetting arrayListScale = new NumberSetting("ArrayList Scale", 0.5, 3.0, 1.0, 0.1);
     public static final ModeSetting colorMode = new ModeSetting("Color Mode", "Astolfo", "Astolfo", "Theme", "Custom");
@@ -46,7 +47,7 @@ public class HUD extends Module {
 
     public HUD() {
         super("HUD", "Renders information", -1, Category.RENDER);
-        addSettings(watermark, watermarkMode, watermarkText, watermarkSimpleFontMode, arrayList, arrayListScale, colorMode, customColor, fontMode, suffixMode, hideVisuals, lowercase, backBarMode, padding, opacity, info, bpsCounter, fpsCounter, scale);
+        addSettings(watermark, watermarkMode, watermarkText, watermarkSimpleFontMode, watermarkScale, arrayList, arrayListScale, colorMode, customColor, fontMode, suffixMode, hideVisuals, lowercase, backBarMode, padding, opacity, info, bpsCounter, fpsCounter, scale);
     }
 
     @EventHandler
@@ -69,8 +70,8 @@ public class HUD extends Module {
 
                         String totalWatermarkText = firstCharacter + Formatting.WHITE.toString() + restOfString;
 
-                         int scaledX = 3;
-                         int scaledY = 3;
+                         int scaledX = (int) (3 * watermarkScale.getValue());
+                         int scaledY = (int) (3 * watermarkScale.getValue());
                          
                          Color watermarkColor = switch (colorMode.getMode()) {
                              case "Astolfo" -> new Color(getAstolfo(0));
@@ -79,7 +80,14 @@ public class HUD extends Module {
                          };
 
                         if (watermarkSimpleFontMode.getMode().equals("MC")) {
-                            event.getContext().drawText(mc.textRenderer, totalWatermarkText, scaledX, scaledY, watermarkColor.getRGB(), true);
+                            event.getContext().getMatrices().push();
+                            event.getContext().getMatrices().scale((float) watermarkScale.getValue(), (float) watermarkScale.getValue(), 1.0f);
+                            
+                            int adjustedX = (int) (scaledX / watermarkScale.getValue());
+                            int adjustedY = (int) (scaledY / watermarkScale.getValue());
+                            
+                            event.getContext().drawText(mc.textRenderer, totalWatermarkText, adjustedX, adjustedY, watermarkColor.getRGB(), true);
+                            event.getContext().getMatrices().pop();
                         } else {
                             getWatermarkFontRenderer(watermarkSimpleFontMode.getMode()).drawString(event.getContext().getMatrices(), totalWatermarkText, scaledX, scaledY, watermarkColor);
                         }
@@ -89,9 +97,9 @@ public class HUD extends Module {
                 case "Gamesense":
                      String text = "§f" + watermarkText.getValue() + "§rsense §8| §f " + ("free") + "§7 (" + ("0000") + ") §8 | §f " + getIP();
 
-                     int padding = 2;
-                     int offsetX = 4;
-                     int offsetY = 4;
+                     int padding = (int) (2 * watermarkScale.getValue());
+                     int offsetX = (int) (4 * watermarkScale.getValue());
+                     int offsetY = (int) (4 * watermarkScale.getValue());
 
                      FontRenderer gamesenseFont = getWatermarkFontRenderer("Inter");
                      int textWidth = (int) gamesenseFont.getStringWidth(text);
@@ -248,7 +256,7 @@ public class HUD extends Module {
     }
 
     private FontRenderer getWatermarkFontRenderer(String name) {
-        int scaledSize = 16;
+        int scaledSize = (int) (16 * watermarkScale.getValue());
         return switch (name) {
             case "JetbrainsMono" -> Volt.INSTANCE.fontManager.getSize(scaledSize, FontManager.Type.JetbrainsMono);
             case "Poppins" -> Volt.INSTANCE.fontManager.getSize(scaledSize, FontManager.Type.Poppins);
