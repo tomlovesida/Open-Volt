@@ -57,12 +57,13 @@ public class AimAssist extends Module {
         if (mc.currentScreen != null) return;
         HitResult hit = mc.crosshairTarget;
 
-        if (disableOnTarget.getValue() && hit != null && hit.getType() == HitResult.Type.ENTITY) {
-            EntityHitResult entityHit = (EntityHitResult) hit;
-            if (entityHit.getEntity() == currentTarget) {
+        if (disableOnTarget.getValue() && hit instanceof EntityHitResult entityHit) {
+            Entity entity = entityHit.getEntity();
+            if (isValidTarget(entity) && entity != currentTarget) {
                 return;
             }
         }
+
 
         currentTarget = findBestTarget();
         
