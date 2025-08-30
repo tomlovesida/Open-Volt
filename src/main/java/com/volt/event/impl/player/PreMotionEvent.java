@@ -7,7 +7,7 @@ import lombok.Setter;
 import net.minecraft.util.math.MathHelper;
 
 @Getter
-public class PreMotion implements Event, IMinecraft {
+public class PreMotionEvent implements Event, IMinecraft {
 
     private final double posX;
     private final double posY;
@@ -27,10 +27,10 @@ public class PreMotion implements Event, IMinecraft {
     @Setter
     private boolean pitchChanged = false;
 
-    public PreMotion(double posX, double posY, double posZ,
-                     float yaw, float pitch,
-                     float lastYaw, float lastPitch,
-                     boolean onGround, boolean isSprinting, boolean isSneaking) {
+    public PreMotionEvent(double posX, double posY, double posZ,
+                          float yaw, float pitch,
+                          float lastYaw, float lastPitch,
+                          boolean onGround, boolean isSprinting, boolean isSneaking) {
         this.posX = posX;
         this.posY = posY;
         this.posZ = posZ;
