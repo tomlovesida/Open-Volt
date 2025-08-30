@@ -21,6 +21,8 @@ import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.Color;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +48,11 @@ public final class ClickGui extends Screen {
     private final GuiEventHandler eventHandler;
     private long lastCursorBlink = 0;
     
+    private String configName = "";
+    private boolean configNameFocused = false;
+    private List<String> configs = new ArrayList<>();
+    private String selectedConfig = "";
+    
     private final FontRenderer titleFont;
     private final FontRenderer regularFont;
     private final FontRenderer smallFont;
@@ -69,6 +76,8 @@ public final class ClickGui extends Screen {
             animationManager.initializeModuleAnimations(module);
         }
         eventHandler.setScrollOffset(lastScrollOffset);
+        
+        loadConfigs();
     }
     
     @Override
@@ -125,7 +134,7 @@ public final class ClickGui extends Screen {
             colorPickerManager.renderColorPickerPanel(context, colorPickerPanelX, containerY, COLOR_PICKER_PANEL_WIDTH, containerHeight, mouseX, mouseY);
         }
         
-        renderHeader(context, containerX, containerY, containerWidth);
+        renderHeader(context, containerX, containerY, containerWidth, mouseX, mouseY);
         
         matrices.pop();
         
@@ -139,7 +148,7 @@ public final class ClickGui extends Screen {
             new Color(0, 0, 0, backgroundAlpha).getRGB(), new Color(0, 0, 0, (int)(backgroundAlpha * 0.67f)).getRGB());
     }
     
-    private void renderHeader(DrawContext context, int x, int y, int width) {
+    private void renderHeader(DrawContext context, int x, int y, int width, int mouseX, int mouseY) {
         int headerAlpha = (int)(animationManager.getGuiAnimation() * 255);
         context.fill(x, y, x + width, y + HEADER_HEIGHT, 
             new Color(35, 35, 50, headerAlpha).getRGB());
@@ -225,6 +234,18 @@ public final class ClickGui extends Screen {
         
         context.enableScissor(x, y + HEADER_HEIGHT, x + width, y + height);
         
+        if (eventHandler.getSelectedCategory() == Category.CONFIG) {
+            renderConfigContent(context, x, y, width, height, mouseX, mouseY);
+        } else {
+            renderModuleContent(context, x, y, width, height, mouseX, mouseY);
+        }
+        
+        context.disableScissor();
+    }
+    
+    private void renderModuleContent(DrawContext context, int x, int y, int width, int height, int mouseX, int mouseY) {
+        MatrixStack matrices = context.getMatrices();
+        
         List<Module> allModules;
         if (eventHandler.getSearchQuery().isEmpty()) {
             allModules = Volt.INSTANCE.getModuleManager().getModulesInCategory(eventHandler.getSelectedCategory());
@@ -309,8 +330,66 @@ public final class ClickGui extends Screen {
         totalContentHeight += PADDING; 
         int visibleHeight = height - HEADER_HEIGHT;
         eventHandler.updateMaxScrollOffset(totalContentHeight, visibleHeight);
+    }
+    
+    private void renderConfigContent(DrawContext context, int x, int y, int width, int height, int mouseX, int mouseY) {
+        MatrixStack matrices = context.getMatrices();
+        int startY = y + HEADER_HEIGHT + PADDING - eventHandler.getScrollOffset();
+        int currentY = startY;
         
-        context.disableScissor();
+        titleFont.drawString(matrices, "Config Manager", x + PADDING, currentY, Color.WHITE);
+        currentY += 50;
+        
+        context.fill(x + PADDING, currentY, x + width - PADDING, currentY + 30, new Color(40, 40, 50, 200).getRGB());
+        String displayText = configName.isEmpty() ? "Enter config name..." : configName;
+        Color textColor = configName.isEmpty() ? new Color(100, 100, 100) : Color.WHITE;
+        regularFont.drawString(matrices, displayText, x + PADDING + 8, currentY + 8, textColor);
+        
+        if (configNameFocused && !configName.isEmpty()) {
+            long currentTime = System.currentTimeMillis();
+            if ((currentTime - lastCursorBlink) % 1000 < 500) {
+                int cursorX = x + PADDING + 8 + (int)regularFont.getStringWidth(configName);
+                context.fill(cursorX, currentY + 6, cursorX + 1, currentY + 24, Color.WHITE.getRGB());
+            }
+        }
+        currentY += 40;
+        
+        renderConfigButton(context, x + PADDING, currentY, 80, 25, "Save", new Color(50, 100, 50), mouseX, mouseY);
+        renderConfigButton(context, x + PADDING + 90, currentY, 80, 25, "Load", new Color(50, 50, 100), mouseX, mouseY);
+        renderConfigButton(context, x + PADDING + 180, currentY, 80, 25, "Delete", new Color(100, 50, 50), mouseX, mouseY);
+        currentY += 40;
+        
+        regularFont.drawString(matrices, "Available Configs:", x + PADDING, currentY, new Color(180, 180, 180));
+        currentY += 25;
+        
+        for (String config : configs) {
+            boolean isHovered = mouseX >= x + PADDING && mouseX <= x + width - PADDING && 
+                              mouseY >= currentY && mouseY <= currentY + 25;
+            boolean isSelected = config.equals(selectedConfig);
+            
+            Color bgColor = isSelected ? new Color(100, 50, 150, 150) : 
+                          (isHovered ? new Color(60, 60, 70, 150) : new Color(40, 40, 50, 100));
+            context.fill(x + PADDING, currentY, x + width - PADDING, currentY + 25, bgColor.getRGB());
+            
+            Color itemTextColor = isSelected ? Color.WHITE : new Color(200, 200, 200);
+            regularFont.drawString(matrices, config, x + PADDING + 8, currentY + 6, itemTextColor);
+            
+            currentY += 30;
+        }
+        
+        int totalContentHeight = currentY - startY + PADDING;
+        int visibleHeight = height - HEADER_HEIGHT;
+        eventHandler.updateMaxScrollOffset(totalContentHeight, visibleHeight);
+    }
+    
+    private void renderConfigButton(DrawContext context, int x, int y, int width, int height, String text, Color baseColor, int mouseX, int mouseY) {
+        boolean isHovered = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
+        Color buttonColor = isHovered ? new Color(baseColor.getRed() + 20, baseColor.getGreen() + 20, baseColor.getBlue() + 20) : baseColor;
+        context.fill(x, y, x + width, y + height, buttonColor.getRGB());
+        
+        int textX = x + (width - (int)smallFont.getStringWidth(text)) / 2;
+        int textY = y + (height - 12) / 2;
+        smallFont.drawString(context.getMatrices(), text, textX, textY, Color.WHITE);
     }
     
     private List<Module> filterModulesBySearch(List<Module> modules) {
@@ -328,6 +407,10 @@ public final class ClickGui extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button < 0 || button > 8) return false;
+        
+        if (eventHandler.getSelectedCategory() == Category.CONFIG && handleConfigClick(mouseX, mouseY, button)) {
+            return true;
+        }
         
         if (handleColorPickerClicks(mouseX, mouseY, button)) {
             return true;
@@ -372,6 +455,22 @@ public final class ClickGui extends Screen {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         
+        if (configNameFocused) {
+            if (keyCode == GLFW.GLFW_KEY_ENTER) {
+                saveConfig();
+                configNameFocused = false;
+                return true;
+            } else if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
+                if (!configName.isEmpty()) {
+                    configName = configName.substring(0, configName.length() - 1);
+                }
+                return true;
+            } else if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+                configNameFocused = false;
+                return true;
+            }
+        }
+        
         if (colorPickerManager.handleColorPickerKeyPress(keyCode)) {
             return true;
         }
@@ -393,6 +492,12 @@ public final class ClickGui extends Screen {
     
     @Override
     public boolean charTyped(char chr, int modifiers) {
+        if (configNameFocused && chr >= 32 && chr < 127) {
+            if (configName.length() < 20) {
+                configName += chr;
+            }
+            return true;
+        }
         if (colorPickerManager.handleColorPickerCharTyped(chr)) return true;
         return eventHandler.handleCharTyped(chr, modifiers) || super.charTyped(chr, modifiers);
     }
@@ -400,5 +505,85 @@ public final class ClickGui extends Screen {
     @Override
     public void close() {
         animationManager.startClosingAnimation();
+    }
+    
+    private void loadConfigs() {
+        configs.clear();
+        File profileDir = Volt.INSTANCE.getProfileManager().getProfileDir();
+        if (profileDir.exists() && profileDir.isDirectory()) {
+            File[] files = profileDir.listFiles((dir, name) -> name.endsWith(".json"));
+            if (files != null) {
+                for (File file : files) {
+                    configs.add(file.getName().replace(".json", ""));
+                }
+            }
+        }
+    }
+    
+    private boolean handleConfigClick(double mouseX, double mouseY, int button) {
+        int screenWidth = width;
+        int screenHeight = height;
+        int containerX = (screenWidth - CONTAINER_WIDTH) / 2;
+        int containerY = (screenHeight - 500) / 2;
+        int contentX = containerX + SIDEBAR_WIDTH;
+        int contentY = containerY + HEADER_HEIGHT + PADDING - eventHandler.getScrollOffset();
+        
+        int inputY = contentY + 50;
+        if (mouseY >= inputY && mouseY <= inputY + 30) {
+            configNameFocused = true;
+            return true;
+        }
+        
+        int buttonY = inputY + 40;
+        if (mouseY >= buttonY && mouseY <= buttonY + 25) {
+            if (mouseX >= contentX + PADDING && mouseX <= contentX + PADDING + 80) {
+                saveConfig();
+                return true;
+            } else if (mouseX >= contentX + PADDING + 90 && mouseX <= contentX + PADDING + 170) {
+                loadConfig();
+                return true;
+            } else if (mouseX >= contentX + PADDING + 180 && mouseX <= contentX + PADDING + 260) {
+                deleteConfig();
+                return true;
+            }
+        }
+        
+        int listY = buttonY + 65;
+        for (String config : configs) {
+            if (mouseY >= listY && mouseY <= listY + 25) {
+                selectedConfig = config;
+                configName = config;
+                return true;
+            }
+            listY += 30;
+        }
+        
+        configNameFocused = false;
+        return false;
+    }
+    
+    private void saveConfig() {
+        if (!configName.trim().isEmpty()) {
+            Volt.INSTANCE.getProfileManager().saveProfile(configName.trim(), true);
+            loadConfigs();
+            selectedConfig = configName.trim();
+        }
+    }
+    
+    private void loadConfig() {
+        if (!selectedConfig.isEmpty()) {
+            Volt.INSTANCE.getProfileManager().loadProfile(selectedConfig);
+        }
+    }
+    
+    private void deleteConfig() {
+        if (!selectedConfig.isEmpty()) {
+            File configFile = new File(Volt.INSTANCE.getProfileManager().getProfileDir(), selectedConfig + ".json");
+            if (configFile.exists() && configFile.delete()) {
+                loadConfigs();
+                selectedConfig = "";
+                configName = "";
+            }
+        }
     }
 }

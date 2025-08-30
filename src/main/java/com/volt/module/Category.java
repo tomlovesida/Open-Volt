@@ -9,7 +9,8 @@ public enum Category {
     MOVEMENT("Movement"),
     RENDER("Render"),
     MISC("Misc"),
-    CLIENT("Client");
+    CLIENT("Client"),
+    CONFIG("Config");
 
     private final String name;
 

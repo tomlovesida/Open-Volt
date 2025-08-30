@@ -84,6 +84,7 @@ public class UIRenderer {
             case RENDER -> new Color(255, 150, 100);
             case MISC -> new Color(200, 100, 255);
             case CLIENT -> new Color(150, 150, 150);
+            case CONFIG -> new Color(100, 200, 255);
         };
     }
 }
