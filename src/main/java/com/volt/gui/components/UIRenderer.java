@@ -1,6 +1,6 @@
 package com.volt.gui.components;
 
-import com.volt.gui.utils.render.MSAARoundedRectShader;
+
 import net.minecraft.client.gui.DrawContext;
 import java.awt.Color;
 
@@ -41,19 +41,12 @@ public class UIRenderer {
     }
     
     public static void renderSlider(DrawContext context, int x, int y, int width, int height, double normalized, Color trackColor, Color fillColor) {
-        float trackX = x;
-        float trackY = y;
-        float trackWidth = width;
-        float trackHeight = height;
-        float trackRadius = trackHeight / 2f;
-
-        MSAARoundedRectShader.getInstance().drawRoundedRect(trackX, trackY, trackWidth, trackHeight, trackRadius, trackColor, 4);
+        context.fill(x, y, x + width, y + height, trackColor.getRGB());
 
         float clamped = (float) Math.max(0.0, Math.min(1.0, normalized));
-        float fillWidth = trackWidth * clamped;
-        if (fillWidth > 0.5f) {
-            float fillRadius = Math.min(trackRadius, fillWidth / 2f);
-            MSAARoundedRectShader.getInstance().drawRoundedRect(trackX, trackY, fillWidth, trackHeight, fillRadius, fillColor, 4);
+        int fillWidth = (int) (width * clamped);
+        if (fillWidth > 0) {
+            context.fill(x, y, x + fillWidth, y + height, fillColor.getRGB());
         }
     }
     
